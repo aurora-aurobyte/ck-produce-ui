@@ -21,10 +21,14 @@ import NotificationsPopover from './common/notifications-popover';
 
 // ----------------------------------------------------------------------
 
-export default function Header({ onOpenNav }) {
+type prop = {
+  onOpenNav: () => void;
+};
+
+export default function Header({ onOpenNav }: prop) {
   const theme = useTheme();
 
-  const lgUp = useResponsive('up', 'lg');
+  const lgUp = useResponsive('up', 'lg', null);
 
   const renderContent = (
     <>
@@ -48,6 +52,7 @@ export default function Header({ onOpenNav }) {
 
   return (
     <AppBar
+      // @ts-ignore
       sx={{
         boxShadow: 'none',
         height: HEADER.H_MOBILE,

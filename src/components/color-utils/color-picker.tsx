@@ -10,18 +10,18 @@ import Iconify from '../iconify';
 // ----------------------------------------------------------------------
 
 const ColorPicker = forwardRef(
-  ({ colors, selected, onSelectColor, limit = 'auto', sx, ...other }, ref) => {
+  ({ colors, selected, onSelectColor, limit = 'auto', sx, ...other }: any, ref) => {
     const singleSelect = typeof selected === 'string';
 
     const handleSelect = useCallback(
-      (color) => {
+      (color: string) => {
         if (singleSelect) {
           if (color !== selected) {
             onSelectColor(color);
           }
         } else {
           const newSelected = selected.includes(color)
-            ? selected.filter((value) => value !== color)
+            ? selected.filter((value: string) => value !== color)
             : [...selected, color];
 
           onSelectColor(newSelected);
@@ -45,7 +45,7 @@ const ColorPicker = forwardRef(
         }}
         {...other}
       >
-        {colors.map((color) => {
+        {colors.map((color: string) => {
           const hasSelected = singleSelect ? selected === color : selected.includes(color);
 
           return (
@@ -84,8 +84,8 @@ const ColorPicker = forwardRef(
                   width={hasSelected ? 12 : 0}
                   icon="eva:checkmark-fill"
                   sx={{
-                    color: (theme) => theme.palette.getContrastText(color),
-                    transition: (theme) =>
+                    color: (theme: any) => theme.palette.getContrastText(color),
+                    transition: (theme: any) =>
                       theme.transitions.create('all', {
                         duration: theme.transitions.duration.shortest,
                       }),

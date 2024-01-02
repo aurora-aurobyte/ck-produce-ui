@@ -30,6 +30,7 @@ const StyledSearchbar = styled('div')(({ theme }) => ({
   alignItems: 'center',
   height: HEADER_MOBILE,
   padding: theme.spacing(0, 3),
+  // @ts-ignore
   boxShadow: theme.customShadows.z8,
   [theme.breakpoints.up('md')]: {
     height: HEADER_DESKTOP,

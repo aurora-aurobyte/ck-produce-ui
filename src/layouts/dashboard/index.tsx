@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useState, ReactNode } from 'react';
 
 import Box from '@mui/material/Box';
 
@@ -9,28 +9,32 @@ import Header from './header';
 
 // ----------------------------------------------------------------------
 
-export default function DashboardLayout({ children }) {
-  const [openNav, setOpenNav] = useState(false);
+type prop = {
+    children: ReactNode;
+};
 
-  return (
-    <>
-      <Header onOpenNav={() => setOpenNav(true)} />
+export default function DashboardLayout({ children }: prop) {
+    const [openNav, setOpenNav] = useState(false);
 
-      <Box
-        sx={{
-          minHeight: 1,
-          display: 'flex',
-          flexDirection: { xs: 'column', lg: 'row' },
-        }}
-      >
-        <Nav openNav={openNav} onCloseNav={() => setOpenNav(false)} />
+    return (
+        <>
+            <Header onOpenNav={() => setOpenNav(true)} />
 
-        <Main>{children}</Main>
-      </Box>
-    </>
-  );
+            <Box
+                sx={{
+                    minHeight: 1,
+                    display: 'flex',
+                    flexDirection: { xs: 'column', lg: 'row' },
+                }}
+            >
+                <Nav openNav={openNav} onCloseNav={() => setOpenNav(false)} />
+
+                <Main>{children}</Main>
+            </Box>
+        </>
+    );
 }
 
 DashboardLayout.propTypes = {
-  children: PropTypes.node,
+    children: PropTypes.node,
 };

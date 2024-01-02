@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import React, { useMemo } from 'react';
 
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
@@ -12,30 +12,35 @@ import { customShadows } from './custom-shadows';
 
 // ----------------------------------------------------------------------
 
-export default function ThemeProvider({ children }) {
-  const memoizedValue = useMemo(
-    () => ({
-      palette: palette(),
-      typography,
-      shadows: shadows(),
-      customShadows: customShadows(),
-      shape: { borderRadius: 8 },
-    }),
-    []
-  );
+type prop = {
+    children: React.ReactNode;
+};
 
-  const theme = createTheme(memoizedValue);
+export default function ThemeProvider({ children }: prop) {
+    const memoizedValue = useMemo(
+        () => ({
+            palette: palette(),
+            typography,
+            shadows: shadows(),
+            customShadows: customShadows(),
+            shape: { borderRadius: 8 },
+        }),
+        []
+    );
 
-  theme.components = overrides(theme);
+    // @ts-ignore
+    const theme: any = createTheme(memoizedValue);
 
-  return (
-    <MUIThemeProvider theme={theme}>
-      <CssBaseline />
-      {children}
-    </MUIThemeProvider>
-  );
+    theme.components = overrides(theme);
+
+    return (
+        <MUIThemeProvider theme={theme}>
+            <CssBaseline />
+            {children}
+        </MUIThemeProvider>
+    );
 }
 
 ThemeProvider.propTypes = {
-  children: PropTypes.node,
+    children: PropTypes.node,
 };
