@@ -120,7 +120,7 @@
     // perfectionist
     // https://eslint-plugin-perfectionist.azat.io/
     "perfectionist/sort-named-imports": [
-      1,
+      0,
       {
         "order": "asc",
         "type": "line-length"
@@ -141,7 +141,7 @@
       }
     ],
     "perfectionist/sort-imports": [
-      1,
+      0,
       {
         "order": "asc",
         "type": "line-length",

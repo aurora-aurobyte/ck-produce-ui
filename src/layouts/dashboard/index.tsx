@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Nav from './nav';
 import Main from './main';
 import Header from './header';
+import BottomNavigationBar from './bottom-navigation';
 
 // ----------------------------------------------------------------------
 
@@ -29,8 +30,9 @@ export default function DashboardLayout({ children }: prop) {
             >
                 <Nav openNav={openNav} onCloseNav={() => setOpenNav(false)} />
 
-                <Main>{children}</Main>
+                <Main sx={{ mb: '72px' }}>{children}</Main>
             </Box>
+            <BottomNavigationBar />
         </>
     );
 }
