@@ -9,7 +9,7 @@ import { StyledScrollbar, StyledRootScrollbar } from './styles';
 
 type prop = {
     children: React.ReactNode;
-    sx: object;
+    sx?: object;
 };
 
 const Scrollbar = forwardRef(({ children, sx, ...other }: prop, ref) => {

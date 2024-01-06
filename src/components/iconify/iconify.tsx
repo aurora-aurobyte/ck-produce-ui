@@ -10,6 +10,8 @@ type prop = {
     icon: string | IconifyIcon;
     width?: number;
     sx?: object;
+    color?: string;
+    height?: number;
 };
 
 const Iconify = forwardRef(({ icon, width = 20, sx, ...other }: prop, ref) => (
