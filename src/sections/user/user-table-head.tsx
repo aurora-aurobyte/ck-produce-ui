@@ -1,3 +1,4 @@
+import { ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
@@ -8,7 +9,6 @@ import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
 import { visuallyHidden } from './utils';
-import { ChangeEvent } from 'react';
 
 // ----------------------------------------------------------------------
 

@@ -8,13 +8,14 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import Iconify from 'src/components/iconify';
+import { ChangeEvent } from 'react';
 
 // ----------------------------------------------------------------------
 
 type Props = {
     numSelected: number;
     filterName: string;
-    onFilterName: (event: React.ChangeEvent<HTMLInputElement>) => any;
+    onFilterName: (event: ChangeEvent<HTMLInputElement>) => any;
 };
 
 export default function UserTableToolbar({ numSelected, filterName, onFilterName }: Props) {

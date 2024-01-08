@@ -86,12 +86,12 @@ export default function UserPage() {
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
         setPage(0);
         setRowsPerPage(parseInt(event.target.value, 10));
     };
 
-    const handleFilterByName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFilterByName = (event: ChangeEvent<HTMLInputElement>) => {
         setPage(0);
         setFilterName(event.target.value);
     };

@@ -8,7 +8,7 @@ import Chart, { useChart } from 'src/components/chart';
 
 // ----------------------------------------------------------------------
 
-type Chart = {
+type ChartType = {
     labels: any;
     colors: any;
     series: any;
@@ -16,7 +16,7 @@ type Chart = {
 };
 
 type Props = {
-    chart: Chart;
+    chart: ChartType;
     subheader?: string;
     title?: string;
 };
