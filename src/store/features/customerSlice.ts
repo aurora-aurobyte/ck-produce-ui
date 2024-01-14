@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 export interface Customer {
     customerId: string;
     name: string;
+    address: string;
 }
 
 interface CustomerState {
@@ -18,7 +19,7 @@ const initialState: CustomerState = {
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchCustomers = createAsyncThunk<Customer[], string>(
+export const fetchCustomers = createAsyncThunk<Customer[]>(
     'customer/fetchCustomers',
     () =>
         new Promise((resolve, _) => {
