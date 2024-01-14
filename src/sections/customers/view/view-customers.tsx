@@ -3,12 +3,16 @@ import Title, { TitleMenu } from 'src/components/title';
 import Table from 'src/components/table';
 
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
-import { Customer, fetchCustomers } from 'src/store/features/customerSlice';
+import { Customer, fetchCustomers, removeCustomer } from 'src/store/features/customerSlice';
 import { useEffect } from 'react';
 
 export default function ViewCustomers() {
     const customers = useAppSelector((state) => state.customer.customers);
     const dispatch = useAppDispatch();
+
+    const handleDeleteClick = (customer: Customer) => {
+        dispatch(removeCustomer(customer.customerId));
+    };
 
     useEffect(() => {
         dispatch(fetchCustomers());
@@ -25,6 +29,8 @@ export default function ViewCustomers() {
                     { id: 'name', label: 'Name' },
                     { id: 'address', label: 'Address' },
                 ]}
+                editPage={(row: Customer) => `/customers/edit/${row.customerId}`}
+                onRemoveClick={handleDeleteClick}
             />
         </Container>
     );

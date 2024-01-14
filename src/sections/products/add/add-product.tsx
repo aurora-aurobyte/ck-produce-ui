@@ -7,8 +7,9 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
-import { Product, addProduct } from 'src/store/features/productSlice';
-import { useAppDispatch } from 'src/store/hooks';
+import { Product, addProduct, updateProduct } from 'src/store/features/productSlice';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
+import { useRouter } from 'src/routes/hooks';
 
 const defaultValues: Product = {
     productId: '',
@@ -18,9 +19,22 @@ const defaultValues: Product = {
     description: '',
 };
 
-export default function AddProduct() {
-    const [values, setValues] = useState<Product>(defaultValues);
+// ----------------------------------------------------------------
+
+type AddProductProps = {
+    productId?: string;
+    edit?: boolean;
+};
+
+export default function AddProduct({ productId, edit }: AddProductProps) {
+    const products = useAppSelector((state) => state.product.products);
+    const [values, setValues] = useState<Product>(
+        edit
+            ? (products.find((customer) => customer.productId === productId || '') as Product)
+            : defaultValues
+    );
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [event.target.name]: event.target.value });
@@ -28,13 +42,17 @@ export default function AddProduct() {
 
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
-        dispatch(addProduct(values));
-        setValues(defaultValues);
+        if (edit) {
+            dispatch(updateProduct({ ...values, productId: productId as string }));
+        } else {
+            dispatch(addProduct(values));
+        }
+        router.back();
     };
 
     return (
         <Container>
-            <Title title="Add Product" />
+            <Title title={edit ? 'Edit Product' : 'Add Product'} />
             <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>

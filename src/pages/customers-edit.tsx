@@ -1,17 +1,19 @@
 import { Helmet } from 'react-helmet-async';
+import { useParams } from 'react-router-dom';
 
 import { AddCustomer } from 'src/sections/customers';
 
 // ----------------------------------------------------------------------
 
-export default function CustomersAddPage() {
+export default function CustomersEditPage() {
+    const { customerId } = useParams();
     return (
         <>
             <Helmet>
-                <title> Add Customer | Minimal UI </title>
+                <title> Edit Customer | Minimal UI </title>
             </Helmet>
 
-            <AddCustomer />
+            <AddCustomer edit customerId={customerId} />
         </>
     );
 }

@@ -51,9 +51,9 @@ export const customerSlice = createSlice({
             }
             localStorage.setItem('customers', JSON.stringify(state.customers));
         },
-        removeCustomer: (state, action: PayloadAction<{ customerId: string }>) => {
+        removeCustomer: (state, action: PayloadAction<string>) => {
             const index = state.customers.findIndex(
-                (customer: Customer) => customer.customerId === action.payload.customerId
+                (customer: Customer) => customer.customerId === action.payload
             );
             if (index > -1) {
                 state.customers.splice(index, 1);

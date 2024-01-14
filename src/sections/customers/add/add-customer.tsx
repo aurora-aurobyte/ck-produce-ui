@@ -7,14 +7,28 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
-import { Customer, addCustomer } from 'src/store/features/customerSlice';
-import { useAppDispatch } from 'src/store/hooks';
+import { Customer, addCustomer, updateCustomer } from 'src/store/features/customerSlice';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
+import { useRouter } from 'src/routes/hooks';
 
 const defaultValues = { customerId: '', name: '', address: '' };
 
-export default function AddCustomer() {
-    const [values, setValues] = useState<Customer>(defaultValues);
+// ----------------------------------------------------------------
+
+type AddCustomerProps = {
+    customerId?: string;
+    edit?: boolean;
+};
+
+export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
+    const customers = useAppSelector((state) => state.customer.customers);
+    const [values, setValues] = useState<Customer>(
+        edit
+            ? (customers.find((customer) => customer.customerId === customerId || '') as Customer)
+            : defaultValues
+    );
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [event.target.name]: event.target.value });
@@ -22,13 +36,17 @@ export default function AddCustomer() {
 
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
-        dispatch(addCustomer(values));
-        setValues(defaultValues);
+        if (edit) {
+            dispatch(updateCustomer({ ...values, customerId: customerId as string }));
+        } else {
+            dispatch(addCustomer(values));
+        }
+        router.back();
     };
 
     return (
         <Container>
-            <Title title="Add Customer" />
+            <Title title={edit ? 'Edit Customer' : 'Add Customer'} />
             <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>

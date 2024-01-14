@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEvent, useState } from 'react';
+import { ChangeEvent, MouseEvent, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import Popover from '@mui/material/Popover';
@@ -10,6 +10,7 @@ import IconButton from '@mui/material/IconButton';
 
 import Iconify from 'src/components/iconify';
 
+import { RouterLink } from 'src/routes/components';
 import { TableColumn } from './tableColumn';
 
 // ----------------------------------------------------------------------
@@ -19,10 +20,20 @@ type TableRowProps<T> = {
     handleClick: (event: ChangeEvent<HTMLInputElement>) => any;
     selected: boolean;
     columns: TableColumn[];
+    editPage?: (row: T) => string | undefined;
+    onRemoveClick?: (row: T) => any;
 };
 
-export default function TableRow<T>({ row, selected, handleClick, columns }: TableRowProps<T>) {
+export default function TableRow<T>({
+    row,
+    selected,
+    handleClick,
+    columns,
+    editPage,
+    onRemoveClick,
+}: TableRowProps<T>) {
     const [open, setOpen] = useState<HTMLButtonElement | null>(null);
+    const editPageUrl = useMemo(() => (editPage ? editPage(row) : '#'), [editPage, row]);
 
     const handleOpenMenu = (event: MouseEvent<HTMLButtonElement>) => {
         setOpen(event.currentTarget);
@@ -30,6 +41,11 @@ export default function TableRow<T>({ row, selected, handleClick, columns }: Tab
 
     const handleCloseMenu = () => {
         setOpen(null);
+    };
+
+    const handleRemoveClick = () => {
+        if (onRemoveClick) onRemoveClick(row);
+        handleCloseMenu();
     };
 
     return (
@@ -60,12 +76,12 @@ export default function TableRow<T>({ row, selected, handleClick, columns }: Tab
                     sx: { width: 140 },
                 }}
             >
-                <MenuItem onClick={handleCloseMenu}>
+                <MenuItem onClick={handleCloseMenu} component={RouterLink} to={editPageUrl}>
                     <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
                     Edit
                 </MenuItem>
 
-                <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
+                <MenuItem onClick={handleRemoveClick} sx={{ color: 'error.main' }}>
                     <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
                     Delete
                 </MenuItem>

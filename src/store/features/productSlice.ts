@@ -53,9 +53,9 @@ export const productSlice = createSlice({
             }
             localStorage.setItem('products', JSON.stringify(state.products));
         },
-        removeProduct: (state, action: PayloadAction<{ productId: string }>) => {
+        removeProduct: (state, action: PayloadAction<string>) => {
             const index = state.products.findIndex(
-                (product: Product) => product.productId === action.payload.productId
+                (product: Product) => product.productId === action.payload
             );
             if (index > -1) {
                 state.products.splice(index, 1);

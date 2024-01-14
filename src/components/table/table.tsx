@@ -21,6 +21,8 @@ import { TableColumn } from './tableColumn';
 interface TableProps<T> {
     data: T[];
     columns: TableColumn[];
+    editPage?: (row: T) => string;
+    onRemoveClick?: (row: T) => any;
     // renderRow?: (
     //     row: T,
     //     selected: boolean,
@@ -28,7 +30,7 @@ interface TableProps<T> {
     // ) => React.ReactNode;
 }
 
-export default function Table<T>({ data, columns }: TableProps<T>) {
+export default function Table<T>({ data, columns, editPage, onRemoveClick }: TableProps<T>) {
     const [page, setPage] = useState(0);
 
     const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -130,6 +132,8 @@ export default function Table<T>({ data, columns }: TableProps<T>) {
                                             handleClick(event, index)
                                         }
                                         columns={columns}
+                                        editPage={editPage}
+                                        onRemoveClick={onRemoveClick}
                                     />
                                 ))}
 
