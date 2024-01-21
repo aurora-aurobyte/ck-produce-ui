@@ -28,7 +28,7 @@ export default function ViewProducts() {
                 columns={[
                     { id: 'name', label: 'Name' },
                     { id: 'unitPrice', label: 'Unit Price' },
-                    { id: 'category', label: 'Category' },
+                    { id: 'categoryName', label: 'Category' },
                     { id: 'description', label: 'Description' },
                 ]}
                 editPage={(row: Product) => `/products/edit/${row.productId}`}

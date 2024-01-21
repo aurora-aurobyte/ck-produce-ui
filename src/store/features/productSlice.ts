@@ -4,8 +4,9 @@ export interface Product {
     productId: string;
     name: string;
     unitPrice: number;
-    category: string;
+    categoryId: string;
     description: string;
+    categoryName: string;
 }
 
 interface ProductState {
@@ -50,7 +51,8 @@ export const productSlice = createSlice({
                 productId: string;
                 name: string;
                 unitPrice: number;
-                category: string;
+                categoryId: string;
+                categoryName: string;
                 description: string;
             }>
         ) => {
@@ -60,7 +62,8 @@ export const productSlice = createSlice({
             if (product) {
                 product.name = action.payload.name;
                 product.unitPrice = action.payload.unitPrice;
-                product.category = action.payload.category;
+                product.categoryId = action.payload.categoryId;
+                product.categoryName = action.payload.categoryName;
                 product.description = action.payload.description;
             }
             localStorage.setItem('products', JSON.stringify(state.products));

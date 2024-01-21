@@ -10,12 +10,14 @@ import Button from '@mui/material/Button';
 import { Product, addProduct, updateProduct } from 'src/store/features/productSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
 const defaultValues: Product = {
     productId: '',
     name: '',
     unitPrice: 0,
-    category: '',
+    categoryId: '',
+    categoryName: '',
     description: '',
 };
 
@@ -28,16 +30,33 @@ type AddProductProps = {
 
 export default function AddProduct({ productId, edit }: AddProductProps) {
     const products = useAppSelector((state) => state.product.products);
+    const categories = useAppSelector((state) => state.category.categories);
     const [values, setValues] = useState<Product>(
         edit
             ? (products.find((product) => product.productId === productId || '') as Product)
             : defaultValues
     );
+
     const dispatch = useAppDispatch();
     const router = useRouter();
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [event.target.name]: event.target.value });
+    };
+
+    const handleSelectChange = (event: SelectChangeEvent<string>) => {
+        const selectedValue = event.target.value;
+        const selectedCategory = categories.find((item) => item.categoryId === selectedValue);
+        console.log({ selectedCategory });
+        if (selectedCategory) {
+            const category = selectedCategory.name;
+
+            setValues({
+                ...values,
+                [event.target.name || '']: selectedValue,
+                categoryName: category,
+            });
+        }
     };
 
     const handleSubmit = (event: FormEvent) => {
@@ -79,16 +98,31 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
-                        <TextField
-                            id="category"
-                            name="category"
-                            label="Category"
-                            variant="standard"
-                            fullWidth
-                            value={values.category}
-                            onChange={handleChange}
-                        />
+                        <FormControl fullWidth>
+                            <InputLabel id="label-categoryId-select" variant="standard">
+                                Category
+                            </InputLabel>
+                            <Select
+                                id="label-categoryId-select"
+                                name="categoryId"
+                                label="Category"
+                                variant="standard"
+                                fullWidth
+                                value={values.categoryId || categories?.[0].categoryId}
+                                onChange={handleSelectChange}
+                            >
+                                {categories.map((item) => (
+                                    <MenuItem
+                                        key={item.name + item.categoryId}
+                                        value={item.categoryId}
+                                    >
+                                        {item.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Grid>
+
                     <Grid item xs={12} md={6}>
                         <TextField
                             id="description"
