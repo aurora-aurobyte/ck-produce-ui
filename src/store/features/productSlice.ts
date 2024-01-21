@@ -39,17 +39,29 @@ export const productSlice = createSlice({
             if (action.payload) {
                 state.products.push({
                     ...action.payload,
-                    productId: String(state.products.length),
+                    productId: String(state.products.length + 1),
                 });
             }
             localStorage.setItem('products', JSON.stringify(state.products));
         },
-        updateProduct: (state, action: PayloadAction<{ productId: string; name: string }>) => {
+        updateProduct: (
+            state,
+            action: PayloadAction<{
+                productId: string;
+                name: string;
+                unitPrice: number;
+                category: string;
+                description: string;
+            }>
+        ) => {
             const product = state.products.find(
                 (_product: Product) => _product.productId === action.payload.productId
             );
             if (product) {
                 product.name = action.payload.name;
+                product.unitPrice = action.payload.unitPrice;
+                product.category = action.payload.category;
+                product.description = action.payload.description;
             }
             localStorage.setItem('products', JSON.stringify(state.products));
         },

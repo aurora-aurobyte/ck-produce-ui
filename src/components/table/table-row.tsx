@@ -19,9 +19,10 @@ type TableRowProps<T> = {
     row: T;
     handleClick: (event: ChangeEvent<HTMLInputElement>) => any;
     selected: boolean;
-    columns: TableColumn[];
+    columns: TableColumn<T>[];
     editPage?: (row: T) => string | undefined;
     onRemoveClick?: (row: T) => any;
+    rowIndex: number;
 };
 
 export default function TableRow<T>({
@@ -31,6 +32,7 @@ export default function TableRow<T>({
     columns,
     editPage,
     onRemoveClick,
+    rowIndex,
 }: TableRowProps<T>) {
     const [open, setOpen] = useState<HTMLButtonElement | null>(null);
     const editPageUrl = useMemo(() => (editPage ? editPage(row) : '#'), [editPage, row]);
@@ -55,8 +57,12 @@ export default function TableRow<T>({
                     <Checkbox disableRipple checked={selected} onChange={handleClick} />
                 </TableCell>
 
-                {columns.map((column: TableColumn, index: number) => (
-                    <TableCell key={index}>{row[column.id as keyof T] as string}</TableCell>
+                {columns.map((column: TableColumn<T>, index: number) => (
+                    <TableCell key={index}>
+                        {column.render
+                            ? column.render(row, rowIndex)
+                            : (row[column.id as keyof T] as string)}
+                    </TableCell>
                 ))}
 
                 <TableCell align="right">

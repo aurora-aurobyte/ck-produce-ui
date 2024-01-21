@@ -20,7 +20,7 @@ import { TableColumn } from './tableColumn';
 
 interface TableProps<T> {
     data: T[];
-    columns: TableColumn[];
+    columns: TableColumn<T>[];
     editPage?: (row: T) => string;
     onRemoveClick?: (row: T) => any;
     // renderRow?: (
@@ -110,7 +110,7 @@ export default function Table<T>({ data, columns, editPage, onRemoveClick }: Tab
 
             <Scrollbar>
                 <TableContainer sx={{ overflow: 'unset' }}>
-                    <MuiTable sx={{ minWidth: 800 }}>
+                    <MuiTable>
                         <TableHead
                             order={order}
                             orderBy={orderBy}
@@ -134,6 +134,7 @@ export default function Table<T>({ data, columns, editPage, onRemoveClick }: Tab
                                         columns={columns}
                                         editPage={editPage}
                                         onRemoveClick={onRemoveClick}
+                                        rowIndex={index}
                                     />
                                 ))}
 

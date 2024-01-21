@@ -37,17 +37,21 @@ export const customerSlice = createSlice({
             if (action.payload) {
                 state.customers.push({
                     ...action.payload,
-                    customerId: String(state.customers.length),
+                    customerId: String(state.customers.length + 1),
                 });
             }
             localStorage.setItem('customers', JSON.stringify(state.customers));
         },
-        updateCustomer: (state, action: PayloadAction<{ customerId: string; name: string }>) => {
+        updateCustomer: (
+            state,
+            action: PayloadAction<{ customerId: string; name: string; address: string }>
+        ) => {
             const customer = state.customers.find(
                 (_customer: Customer) => _customer.customerId === action.payload.customerId
             );
             if (customer) {
                 customer.name = action.payload.name;
+                customer.address = action.payload.address;
             }
             localStorage.setItem('customers', JSON.stringify(state.customers));
         },

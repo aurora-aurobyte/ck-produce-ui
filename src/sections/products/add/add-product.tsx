@@ -30,7 +30,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
     const products = useAppSelector((state) => state.product.products);
     const [values, setValues] = useState<Product>(
         edit
-            ? (products.find((customer) => customer.productId === productId || '') as Product)
+            ? (products.find((product) => product.productId === productId || '') as Product)
             : defaultValues
     );
     const dispatch = useAppDispatch();
