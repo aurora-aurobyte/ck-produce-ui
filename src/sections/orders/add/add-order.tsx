@@ -14,14 +14,20 @@ import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
 
 import Iconify from 'src/components/iconify';
-import { Order, OrderItem, addOrder, updateOrder } from 'src/store/features/orderSlice';
 import { Product, fetchProducts } from 'src/store/features/productSlice';
 import { Customer, fetchCustomers } from 'src/store/features/customerSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
 import { fDate } from 'src/utils/format-time';
+import { useSearchParams } from 'react-router-dom';
+
+import { Order, OrderItem, addOrder, updateOrder } from 'src/store/features/orderSlice';
+import { addInvoice } from 'src/store/features/invoiceSlice';
+import { v4 as uuidv4 } from 'uuid';
+import CreateInvoice from './create-invoice';
 
 const defaultValues: Order = {
     orderId: '',
@@ -54,16 +60,10 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
     const customers = useAppSelector((state) => state.customer.customers);
 
     const [orderValues, setOrderValues] = useState<Order>(defaultValues);
-    const [orderItems, setOrderItems] = useState<OrderItem[]>([
-        // {
-        //     productId: '1',
-        //     productName: 'Prodduct 1',
-        //     unitPrice: 12,
-        //     category: '',
-        //     quantity: 5,
-        // },
-    ]);
+    const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
     const [orderItemsValues, setOrderItemsValues] = useState<OrderItem>(defaultOrderItem);
+
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const dispatch = useAppDispatch();
     const router = useRouter();
@@ -89,7 +89,7 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
         if (edit) {
             dispatch(updateOrder({ ...orderValues, orderItems, orderId: orderId as string }));
         } else {
-            dispatch(addOrder({ ...orderValues, orderItems }));
+            dispatch(addOrder({ ...orderValues, orderId: uuidv4(), orderItems }));
         }
         router.back();
     };
@@ -116,6 +116,38 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
             ]);
             setOrderItemsValues(defaultOrderItem);
         }
+    };
+
+    const handleCreateInvoiceClick = () => {
+        setSearchParams({ invoice: '1' });
+    };
+
+    const handleInvoiceClose = () => {
+        setSearchParams({ invoice: '0' });
+    };
+
+    const handleCreateClick = (selected: number[]) => {
+        handleInvoiceClose();
+        const newInvoiceId = uuidv4();
+        dispatch(
+            addInvoice({
+                ...orderValues,
+                invoiceId: newInvoiceId,
+                customerId: '',
+                paid: false,
+                invoiceItems: orderItems
+                    .filter((_, index: number) => selected.includes(index))
+                    .map((orderItem) => ({
+                        productId: orderItem.productId,
+                        productName: orderItem.productName,
+                        purchasePrice: orderItem.unitPrice,
+                        unitPrice: orderItem.unitPrice,
+                        category: orderItem.category,
+                        quantity: orderItem.quantity,
+                    })),
+            })
+        );
+        router.push(`/invoices/edit/${newInvoiceId}`);
     };
 
     useEffect(() => {
@@ -164,172 +196,197 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
             ),
         [orderItems, products]
     );
+    const invoiceOpened = useMemo(() => searchParams.get('invoice') === '1', [searchParams]);
 
     return (
-        <Container>
-            <Title title={edit ? 'Edit Order' : 'Add Order'} />
-            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            id="date"
-                            name="date"
-                            label="Order Date"
-                            variant="standard"
-                            fullWidth
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            defaultValue={fDate(orderValues.date)}
-                        />
+        <>
+            <Container>
+                <Title title={edit ? 'Edit Order' : 'Add Order'} />
+                <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                id="date"
+                                name="date"
+                                label="Order Date"
+                                variant="standard"
+                                fullWidth
+                                InputProps={{
+                                    readOnly: true,
+                                }}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                defaultValue={fDate(orderValues.date)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                id="customerName"
+                                name="customerName"
+                                label="Customer"
+                                variant="standard"
+                                select
+                                fullWidth
+                                value={orderValues.customerName}
+                                onChange={handleOrderChange}
+                            >
+                                {customers.map((customer: Customer) => (
+                                    <MenuItem key={customer.customerId} value={customer.name}>
+                                        {customer.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            id="customerName"
-                            name="customerName"
-                            label="Customer"
-                            variant="standard"
-                            select
-                            fullWidth
-                            value={orderValues.customerName}
-                            onChange={handleOrderChange}
-                        >
-                            {customers.map((customer: Customer) => (
-                                <MenuItem key={customer.customerId} value={customer.name}>
-                                    {customer.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                </Grid>
-                <TableContainer sx={{ mt: 2 }}>
-                    <Table size="small">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ pl: 0 }}>Product Name</TableCell>
-                                <TableCell align="right">Price</TableCell>
-                                <TableCell align="right">Qty</TableCell>
-                                <TableCell align="right">Total</TableCell>
-                                <TableCell sx={{ px: 0 }} />
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {orderItems.map((orderItem: OrderItem) => (
-                                <TableRow key={orderItem.productId} hover>
-                                    <TableCell sx={{ pl: 0 }}>{orderItem.productName}</TableCell>
-                                    <TableCell align="right">{orderItem.unitPrice}</TableCell>
-                                    <TableCell align="right">{orderItem.quantity}</TableCell>
+                    <TableContainer sx={{ mt: 2 }}>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ pl: 0 }}>Product Name</TableCell>
+                                    <TableCell align="right">Price</TableCell>
+                                    <TableCell align="right">Qty</TableCell>
+                                    <TableCell align="right">Total</TableCell>
+                                    <TableCell sx={{ px: 0 }} />
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {orderItems.map((orderItem: OrderItem) => (
+                                    <TableRow key={orderItem.productId} hover>
+                                        <TableCell sx={{ pl: 0 }}>
+                                            {orderItem.productName}
+                                        </TableCell>
+                                        <TableCell align="right">{orderItem.unitPrice}</TableCell>
+                                        <TableCell align="right">{orderItem.quantity}</TableCell>
+                                        <TableCell align="right">
+                                            {orderItem.unitPrice * orderItem.quantity}
+                                        </TableCell>
+                                        <TableCell align="right" sx={{ px: 0 }}>
+                                            <IconButton
+                                                onClick={() =>
+                                                    handleRemoveItem(orderItem.productId)
+                                                }
+                                            >
+                                                <Iconify icon="eva:trash-2-fill" />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                <TableRow
+                                    sx={(theme) => ({
+                                        backgroundColor: theme.palette.action.hover,
+                                    })}
+                                >
+                                    <TableCell sx={{ pl: 0 }}>
+                                        <TextField
+                                            id="productId"
+                                            name="productId"
+                                            label="Product"
+                                            variant="standard"
+                                            select
+                                            fullWidth
+                                            value={orderItemsValues.productId}
+                                            onChange={handleOrderItemChange}
+                                        >
+                                            {filteredProducts.map((product: Product) => (
+                                                <MenuItem
+                                                    key={product.productId}
+                                                    value={product.productId}
+                                                >
+                                                    {product.name}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            id="unitPrice"
+                                            name="unitPrice"
+                                            label="Price"
+                                            variant="standard"
+                                            type="number"
+                                            fullWidth
+                                            value={orderItemsValues.unitPrice}
+                                            onChange={handleOrderItemChange}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            id="quantity"
+                                            name="quantity"
+                                            label="Quantity"
+                                            variant="standard"
+                                            type="number"
+                                            fullWidth
+                                            value={orderItemsValues.quantity}
+                                            onChange={handleOrderItemChange}
+                                        />
+                                    </TableCell>
                                     <TableCell align="right">
-                                        {orderItem.unitPrice * orderItem.quantity}
+                                        {orderItemsValues.unitPrice * orderItemsValues.quantity}
                                     </TableCell>
                                     <TableCell align="right" sx={{ px: 0 }}>
-                                        <IconButton
-                                            onClick={() => handleRemoveItem(orderItem.productId)}
-                                        >
-                                            <Iconify icon="eva:trash-2-fill" />
+                                        <IconButton onClick={handleAddOrderItem}>
+                                            <Iconify icon="eva:plus-circle-outline" />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>
-                            ))}
-                            <TableRow
-                                sx={(theme) => ({ backgroundColor: theme.palette.action.hover })}
-                            >
-                                <TableCell sx={{ pl: 0 }}>
-                                    <TextField
-                                        id="productId"
-                                        name="productId"
-                                        label="Product"
-                                        variant="standard"
-                                        select
-                                        fullWidth
-                                        value={orderItemsValues.productId}
-                                        onChange={handleOrderItemChange}
-                                    >
-                                        {filteredProducts.map((product: Product) => (
-                                            <MenuItem
-                                                key={product.productId}
-                                                value={product.productId}
-                                            >
-                                                {product.name}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                </TableCell>
-                                <TableCell>
-                                    <TextField
-                                        id="unitPrice"
-                                        name="unitPrice"
-                                        label="Price"
-                                        variant="standard"
-                                        type="number"
-                                        fullWidth
-                                        value={orderItemsValues.unitPrice}
-                                        onChange={handleOrderItemChange}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <TextField
-                                        id="quantity"
-                                        name="quantity"
-                                        label="Quantity"
-                                        variant="standard"
-                                        type="number"
-                                        fullWidth
-                                        value={orderItemsValues.quantity}
-                                        onChange={handleOrderItemChange}
-                                    />
-                                </TableCell>
-                                <TableCell align="right">
-                                    {orderItemsValues.unitPrice * orderItemsValues.quantity}
-                                </TableCell>
-                                <TableCell align="right" sx={{ px: 0 }}>
-                                    <IconButton onClick={handleAddOrderItem}>
-                                        <Iconify icon="eva:plus-circle-outline" />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right" colSpan={3}>
-                                    Sub total
-                                </TableCell>
-                                <TableCell align="right">{orderValues.subTotal}</TableCell>
-                                <TableCell sx={{ px: 0 }} />
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right" colSpan={3}>
-                                    Discount
-                                </TableCell>
-                                <TableCell align="right" colSpan={2} sx={{ pr: 0 }}>
-                                    <TextField
-                                        id="discount"
-                                        name="discount"
-                                        label="Discount"
-                                        variant="standard"
-                                        type="number"
-                                        fullWidth
-                                        size="small"
-                                        value={orderValues.discount}
-                                        onChange={handleOrderChange}
-                                    />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right" colSpan={3}>
-                                    Total
-                                </TableCell>
-                                <TableCell align="right">{orderValues.total}</TableCell>
-                                <TableCell sx={{ px: 0 }} />
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <Button variant="contained" color="inherit" type="submit" sx={{ mt: 2 }}>
-                    Save
-                </Button>
-            </Box>
-        </Container>
+                                {/* <TableRow>
+                                    <TableCell align="right" colSpan={3}>
+                                        Sub total
+                                    </TableCell>
+                                    <TableCell align="right">{orderValues.subTotal}</TableCell>
+                                    <TableCell sx={{ px: 0 }} />
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell align="right" colSpan={3}>
+                                        Discount
+                                    </TableCell>
+                                    <TableCell align="right" colSpan={2} sx={{ pr: 0 }}>
+                                        <TextField
+                                            id="discount"
+                                            name="discount"
+                                            label="Discount"
+                                            variant="standard"
+                                            type="number"
+                                            fullWidth
+                                            size="small"
+                                            value={orderValues.discount}
+                                            onChange={handleOrderChange}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell align="right" colSpan={3}>
+                                        Total
+                                    </TableCell>
+                                    <TableCell align="right">{orderValues.total}</TableCell>
+                                    <TableCell sx={{ px: 0 }} />
+                                </TableRow> */}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                        <Button variant="contained" color="inherit" type="submit">
+                            Save
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="inherit"
+                            type="button"
+                            onClick={handleCreateInvoiceClick}
+                        >
+                            Create Invoice
+                        </Button>
+                    </Stack>
+                </Box>
+            </Container>
+            <CreateInvoice
+                open={invoiceOpened}
+                handleClose={handleInvoiceClose}
+                orderItems={orderItems}
+                handleCreateClick={handleCreateClick}
+            />
+        </>
     );
 }

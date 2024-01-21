@@ -19,6 +19,10 @@ export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const OrdersAddPage = lazy(() => import('src/pages/orders-add'));
 export const OrdersEditPage = lazy(() => import('src/pages/orders-edit'));
 
+export const InvoicesPage = lazy(() => import('src/pages/invoices'));
+export const InvoicesAddPage = lazy(() => import('src/pages/invoices-add'));
+export const InvoicesEditPage = lazy(() => import('src/pages/invoices-edit'));
+
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -59,6 +63,14 @@ export default function Router() {
                         { element: <OrdersPage />, index: true },
                         { path: 'add', element: <OrdersAddPage /> },
                         { path: 'edit/:orderId', element: <OrdersEditPage /> },
+                    ],
+                },
+                {
+                    path: 'invoices',
+                    children: [
+                        { element: <InvoicesPage />, index: true },
+                        { path: 'add', element: <InvoicesAddPage /> },
+                        { path: 'edit/:invoiceId', element: <InvoicesEditPage /> },
                     ],
                 },
                 { path: 'blog', element: <BlogPage /> },
