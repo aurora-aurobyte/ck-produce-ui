@@ -26,6 +26,10 @@ export const InvoicesEditPage = lazy(() => import('src/pages/invoices-edit'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
+export const CategoryPage = lazy(() => import('src/pages/categories'));
+export const CategoriesAddPage = lazy(() => import('src/pages/categories-add'));
+export const CategoriesEditPage = lazy(() => import('src/pages/categories-edit'));
+
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -74,6 +78,14 @@ export default function Router() {
                     ],
                 },
                 { path: 'blog', element: <BlogPage /> },
+                {
+                    path: 'categories',
+                    children: [
+                        { element: <CategoryPage />, index: true },
+                        { path: 'add', element: <CategoriesAddPage /> },
+                        { path: 'edit/:categoryId', element: <CategoriesEditPage /> },
+                    ],
+                },
             ],
         },
         {
