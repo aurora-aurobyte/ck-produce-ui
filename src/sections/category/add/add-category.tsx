@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, FormEvent, useEffect } from 'react';
+import { useEffect } from 'react';
 import Container from 'src/components/container/container';
 import Title from 'src/components/title';
 
@@ -10,11 +10,13 @@ import Button from '@mui/material/Button';
 import { Category, updateCategory, addCategory } from 'src/store/features/categorySlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
+import { v4 as uuidv4 } from 'uuid';
+import { useForm, SubmitHandler } from 'react-hook-form';
 
-const defaultValues: Category = {
-    categoryId: '',
-    name: '',
-};
+interface IFormInput {
+    name: string;
+    categoryId: string;
+}
 
 // ----------------------------------------------------------------
 
@@ -24,48 +26,57 @@ type AddCategoryProps = {
 };
 
 export default function AddCategory({ categoryId, edit }: Readonly<AddCategoryProps>) {
-    const categories = useAppSelector((state) => state.category.categories);
-
-    const [values, setValues] = useState<Category>(defaultValues);
-
-    useEffect(() => {
-        if (!edit) return;
-        setValues(
-            categories.find((category) => category.categoryId === categoryId || '') as Category
-        );
-    }, [categoryId, categories, edit]);
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors },
+    } = useForm<IFormInput>({ mode: 'onChange' });
 
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setValues({ ...values, [event.target.name]: event.target.value });
-    };
+    const categories = useAppSelector((state) => state.category.categories);
 
-    const handleSubmit = (event: FormEvent) => {
-        event.preventDefault();
+    const onSubmit: SubmitHandler<IFormInput> = (data) => {
         if (edit) {
-            dispatch(updateCategory({ ...values, categoryId: categoryId as string }));
+            dispatch(updateCategory({ ...data, categoryId: categoryId as string }));
         } else {
-            dispatch(addCategory(values));
+            dispatch(addCategory({ ...data, categoryId: uuidv4() }));
         }
         router.back();
     };
 
+    useEffect(() => {
+        if (!edit) return;
+        const val = categories.find(
+            (category) => category.categoryId === categoryId || ''
+        ) as Category;
+
+        setValue('name', val.name);
+        setValue('categoryId', val.categoryId);
+    }, [categoryId, categories, edit, setValue]);
+
     return (
         <Container>
             <Title title={edit ? 'Edit Category' : 'Add Category'} />
-            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
+            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={12}>
                         <TextField
                             id="name"
-                            name="name"
+                            {...register('name', {
+                                required: 'This is required',
+                                maxLength: {
+                                    value: 100,
+                                    message: 'Category name exceed maximum length.',
+                                },
+                            })}
                             label="Category Name"
                             variant="standard"
                             fullWidth
-                            value={values?.name}
-                            onChange={handleChange}
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
                         />
                     </Grid>
                     <Grid item xs={12}>

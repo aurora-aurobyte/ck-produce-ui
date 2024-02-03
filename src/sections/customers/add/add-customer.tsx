@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, FormEvent } from 'react';
+import { useEffect } from 'react';
 import Container from 'src/components/container/container';
 import Title from 'src/components/title';
 
@@ -10,9 +10,14 @@ import Button from '@mui/material/Button';
 import { Customer, addCustomer, updateCustomer } from 'src/store/features/customerSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
+import { v4 as uuidv4 } from 'uuid';
+import { useForm, SubmitHandler } from 'react-hook-form';
 
-const defaultValues = { customerId: '', name: '', address: '' };
-
+interface IFormInput {
+    customerId: string;
+    name: string;
+    address: string;
+}
 // ----------------------------------------------------------------
 
 type AddCustomerProps = {
@@ -21,54 +26,74 @@ type AddCustomerProps = {
 };
 
 export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors },
+    } = useForm<IFormInput>({ mode: 'onChange' });
+
     const customers = useAppSelector((state) => state.customer.customers);
-    const [values, setValues] = useState<Customer>(
-        edit
-            ? (customers.find((customer) => customer.customerId === customerId || '') as Customer)
-            : defaultValues
-    );
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setValues({ ...values, [event.target.name]: event.target.value });
-    };
-
-    const handleSubmit = (event: FormEvent) => {
-        event.preventDefault();
+    const onSubmit: SubmitHandler<IFormInput> = (values) => {
         if (edit) {
             dispatch(updateCustomer({ ...values, customerId: customerId as string }));
         } else {
-            dispatch(addCustomer(values));
+            dispatch(addCustomer({ ...values, customerId: uuidv4() }));
         }
         router.back();
     };
 
+    useEffect(() => {
+        if (!edit) return;
+        const val = customers.find(
+            (customer) => customer.customerId === customerId || ''
+        ) as Customer;
+
+        setValue('name', val.name);
+        setValue('customerId', val.customerId);
+        setValue('address', val.address);
+    }, [customerId, customers, edit, setValue]);
+
     return (
         <Container>
             <Title title={edit ? 'Edit Customer' : 'Add Customer'} />
-            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
+            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                         <TextField
                             id="name"
-                            name="name"
                             label="Customer Name"
                             variant="standard"
                             fullWidth
-                            value={values.name}
-                            onChange={handleChange}
+                            {...register('name', {
+                                required: 'This is required',
+                                maxLength: {
+                                    value: 100,
+                                    message: 'Category name exceed maximum length.',
+                                },
+                            })}
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <TextField
                             id="address"
-                            name="address"
                             label="Customer Address"
                             variant="standard"
                             fullWidth
-                            value={values.address}
-                            onChange={handleChange}
+                            {...register('address', {
+                                required: 'This is required',
+                                maxLength: {
+                                    value: 100,
+                                    message: 'Address exceed maximum length.',
+                                },
+                            })}
+                            error={!!errors.address}
+                            helperText={errors.address?.message}
                         />
                     </Grid>
                     <Grid item xs={12}>

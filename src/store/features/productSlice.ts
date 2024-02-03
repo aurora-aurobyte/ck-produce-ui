@@ -38,10 +38,7 @@ export const productSlice = createSlice({
     reducers: {
         addProduct: (state, action: PayloadAction<Product>) => {
             if (action.payload) {
-                state.products.push({
-                    ...action.payload,
-                    productId: String(state.products.length + 1),
-                });
+                state.products.push(action.payload);
             }
             localStorage.setItem('products', JSON.stringify(state.products));
         },

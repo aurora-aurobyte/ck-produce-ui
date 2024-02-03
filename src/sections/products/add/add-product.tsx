@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, FormEvent } from 'react';
+import { useEffect } from 'react';
 import Container from 'src/components/container/container';
 import Title from 'src/components/title';
 
@@ -10,16 +10,18 @@ import Button from '@mui/material/Button';
 import { Product, addProduct, updateProduct } from 'src/store/features/productSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { v4 as uuidv4 } from 'uuid';
+import { useForm, SubmitHandler } from 'react-hook-form';
 
-const defaultValues: Product = {
-    productId: '',
-    name: '',
-    unitPrice: 0,
-    categoryId: '',
-    categoryName: '',
-    description: '',
-};
+interface IFormInput {
+    productId: string;
+    name: string;
+    unitPrice: number;
+    categoryId: string;
+    categoryName: string;
+    description: string;
+}
 
 // ----------------------------------------------------------------
 
@@ -31,70 +33,81 @@ type AddProductProps = {
 export default function AddProduct({ productId, edit }: AddProductProps) {
     const products = useAppSelector((state) => state.product.products);
     const categories = useAppSelector((state) => state.category.categories);
-    const [values, setValues] = useState<Product>(
-        edit
-            ? (products.find((product) => product.productId === productId || '') as Product)
-            : defaultValues
-    );
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        getValues,
+        watch,
+        formState: { errors },
+    } = useForm<IFormInput>({
+        mode: 'onChange',
+    });
 
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setValues({ ...values, [event.target.name]: event.target.value });
-    };
-
-    const handleSelectChange = (event: SelectChangeEvent<string>) => {
-        const selectedValue = event.target.value;
-        const selectedCategory = categories.find((item) => item.categoryId === selectedValue);
-        console.log({ selectedCategory });
-        if (selectedCategory) {
-            const category = selectedCategory.name;
-
-            setValues({
-                ...values,
-                [event.target.name || '']: selectedValue,
-                categoryName: category,
-            });
-        }
-    };
-
-    const handleSubmit = (event: FormEvent) => {
-        event.preventDefault();
+    const onSubmit: SubmitHandler<IFormInput> = (values) => {
         if (edit) {
             dispatch(updateProduct({ ...values, productId: productId as string }));
         } else {
-            dispatch(addProduct(values));
+            dispatch(addProduct({ ...values, productId: uuidv4() }));
         }
         router.back();
     };
 
+    useEffect(() => {
+        if (!edit) return;
+
+        const val = products.find((product) => product.productId === productId || '') as Product;
+
+        setValue('name', val.name);
+        setValue('productId', val.productId);
+        setValue('unitPrice', val.unitPrice);
+        setValue('categoryName', val.categoryName);
+        setValue('categoryId', val.categoryId);
+        setValue('description', val.description);
+    }, [productId, products, edit, setValue, categories]);
+
+    if (!watch('categoryId') && edit) return 'Loading...';
     return (
         <Container>
             <Title title={edit ? 'Edit Product' : 'Add Product'} />
-            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
+            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                         <TextField
                             id="name"
-                            name="name"
                             label="Product Name"
                             variant="standard"
                             fullWidth
-                            value={values.name}
-                            onChange={handleChange}
+                            {...register('name', {
+                                required: 'This is required',
+                                maxLength: {
+                                    value: 100,
+                                    message: 'Category name exceed maximum length.',
+                                },
+                            })}
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <TextField
                             id="unitPrice"
-                            name="unitPrice"
                             label="Product Price"
                             variant="standard"
                             type="number"
                             fullWidth
-                            value={values.unitPrice}
-                            onChange={handleChange}
+                            {...register('unitPrice', {
+                                required: 'This is required',
+                                min: {
+                                    value: 0,
+                                    message: 'Unit price minimum is 0.',
+                                },
+                            })}
+                            error={!!errors.unitPrice}
+                            helperText={errors.unitPrice?.message}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -104,17 +117,22 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                             </InputLabel>
                             <Select
                                 id="label-categoryId-select"
-                                name="categoryId"
                                 label="Category"
                                 variant="standard"
                                 fullWidth
-                                value={values.categoryId || categories?.[0].categoryId}
-                                onChange={handleSelectChange}
+                                {...register('categoryId', {
+                                    required: 'This is required',
+                                })}
+                                error={!!errors.categoryId}
+                                // helperText={errors.categoryId?.message}
+                                defaultValue={getValues('categoryId') || categories?.[0].categoryId}
+                                // onChange={handleSelectChange}
                             >
                                 {categories.map((item) => (
                                     <MenuItem
                                         key={item.name + item.categoryId}
                                         value={item.categoryId}
+                                        onClick={() => setValue('categoryName', item.name)}
                                     >
                                         {item.name}
                                     </MenuItem>
@@ -126,12 +144,18 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                     <Grid item xs={12} md={6}>
                         <TextField
                             id="description"
-                            name="description"
                             label="Description"
                             variant="standard"
                             fullWidth
-                            value={values.description}
-                            onChange={handleChange}
+                            {...register('description', {
+                                required: 'This is required',
+                                maxLength: {
+                                    value: 100,
+                                    message: 'Description maximum limit exceed.',
+                                },
+                            })}
+                            error={!!errors.description}
+                            helperText={errors.description?.message}
                         />
                     </Grid>
                     <Grid item xs={12}>

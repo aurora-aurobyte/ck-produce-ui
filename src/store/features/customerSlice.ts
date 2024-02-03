@@ -35,10 +35,7 @@ export const customerSlice = createSlice({
     reducers: {
         addCustomer: (state, action: PayloadAction<Customer>) => {
             if (action.payload) {
-                state.customers.push({
-                    ...action.payload,
-                    customerId: String(state.customers.length + 1),
-                });
+                state.customers.push(action.payload);
             }
             localStorage.setItem('customers', JSON.stringify(state.customers));
         },

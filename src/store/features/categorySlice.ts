@@ -34,10 +34,7 @@ export const categorySlice = createSlice({
     reducers: {
         addCategory: (state, action: PayloadAction<Category>) => {
             if (action.payload) {
-                state.categories.push({
-                    ...action.payload,
-                    categoryId: String(state.categories.length + 1),
-                });
+                state.categories.push(action.payload);
             }
             localStorage.setItem('categories', JSON.stringify(state.categories));
         },
