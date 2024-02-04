@@ -12,11 +12,11 @@ const navConfig = [
         path: '/',
         icon: icon('ic_analytics'),
     },
-    {
-        title: 'user',
-        path: '/user',
-        icon: icon('ic_user'),
-    },
+    // {
+    //     title: 'user',
+    //     path: '/user',
+    //     icon: icon('ic_user'),
+    // },
     {
         title: 'product',
         path: '/products',
@@ -28,20 +28,30 @@ const navConfig = [
         icon: icon('ic_blog'),
     },
     {
-        title: 'blog',
-        path: '/blog',
-        icon: icon('ic_blog'),
+        title: 'order',
+        path: '/orders',
+        icon: icon('ic_cart'),
     },
     {
-        title: 'login',
-        path: '/login',
-        icon: icon('ic_lock'),
+        title: 'invoice',
+        path: '/invoices',
+        icon: icon('ic_cart'),
     },
-    {
-        title: 'Not found',
-        path: '/404',
-        icon: icon('ic_disabled'),
-    },
+    // {
+    //     title: 'blog',
+    //     path: '/blog',
+    //     icon: icon('ic_blog'),
+    // },
+    // {
+    //     title: 'login',
+    //     path: '/login',
+    //     icon: icon('ic_lock'),
+    // },
+    // {
+    //     title: 'Not found',
+    //     path: '/404',
+    //     icon: icon('ic_disabled'),
+    // },
 ];
 
 const bottomNavConfig = [
@@ -51,8 +61,8 @@ const bottomNavConfig = [
         icon: icon('ic_analytics'),
     },
     {
-        title: 'user',
-        path: '/user',
+        title: 'customer',
+        path: '/customers',
         icon: icon('ic_user'),
     },
     {
@@ -61,8 +71,8 @@ const bottomNavConfig = [
         icon: icon('ic_cart'),
     },
     {
-        title: 'blog',
-        path: '/blog',
+        title: 'order',
+        path: '/orders',
         icon: icon('ic_blog'),
     },
 ];
