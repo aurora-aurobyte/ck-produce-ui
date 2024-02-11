@@ -12,7 +12,7 @@ import { fShortenNumber } from 'src/utils/format-number';
 
 type Props = {
     title: string;
-    subheader: string;
+    subheader?: string;
     list: any[];
 };
 

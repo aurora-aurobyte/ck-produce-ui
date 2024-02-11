@@ -16,7 +16,7 @@ import Iconify from 'src/components/iconify';
 
 type Props = {
     list: any[];
-    subheader: string;
+    subheader?: string;
     title: string;
 };
 

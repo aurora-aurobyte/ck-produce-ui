@@ -142,6 +142,7 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                         productName: orderItem.productName,
                         purchasePrice: orderItem.unitPrice,
                         unitPrice: orderItem.unitPrice,
+                        tax: 0,
                         category: orderItem.category,
                         quantity: orderItem.quantity,
                     })),

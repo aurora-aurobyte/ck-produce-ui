@@ -126,6 +126,7 @@ export default function Table<T>({ data, columns, editPage, onRemoveClick }: Tab
                                 .map((row: T, index: number) => (
                                     <TableRow
                                         key={index}
+                                        // @ts-ignore
                                         row={row}
                                         selected={selected.includes(index)}
                                         handleClick={(event: ChangeEvent) =>

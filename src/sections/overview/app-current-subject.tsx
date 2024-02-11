@@ -28,7 +28,7 @@ const StyledChart = styled(Chart)(({ theme }) => ({
 
 type Props = {
     chart: any;
-    subheader: string;
+    subheader?: string;
     title: string;
 };
 

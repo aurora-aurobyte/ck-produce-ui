@@ -16,7 +16,7 @@ import { fDateTime } from 'src/utils/format-time';
 
 type Props = {
     list: any[];
-    subheader: string;
+    subheader?: string;
     title: string;
 };
 
