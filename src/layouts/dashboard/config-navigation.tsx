@@ -23,6 +23,11 @@ const navConfig = [
         icon: icon('ic_cart'),
     },
     {
+        title: 'customer',
+        path: '/customers',
+        icon: icon('ic_cart'),
+    },
+    {
         title: 'category',
         path: '/categories',
         icon: icon('ic_blog'),
@@ -35,6 +40,11 @@ const navConfig = [
     {
         title: 'invoice',
         path: '/invoices',
+        icon: icon('ic_cart'),
+    },
+    {
+        title: 'purchase',
+        path: '/purchases',
         icon: icon('ic_cart'),
     },
     // {
@@ -55,11 +65,11 @@ const navConfig = [
 ];
 
 const bottomNavConfig = [
-    {
-        title: 'dashboard',
-        path: '/',
-        icon: icon('ic_analytics'),
-    },
+    // {
+    //     title: 'dashboard',
+    //     path: '/',
+    //     icon: icon('ic_analytics'),
+    // },
     {
         title: 'customer',
         path: '/customers',
@@ -71,8 +81,18 @@ const bottomNavConfig = [
         icon: icon('ic_cart'),
     },
     {
+        title: 'category',
+        path: '/categories',
+        icon: icon('ic_cart'),
+    },
+    {
         title: 'order',
         path: '/orders',
+        icon: icon('ic_blog'),
+    },
+    {
+        title: 'purchase',
+        path: '/purchases',
         icon: icon('ic_blog'),
     },
 ];

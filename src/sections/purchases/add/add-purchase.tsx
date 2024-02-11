@@ -15,78 +15,69 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 
 import Iconify from 'src/components/iconify';
-import { Invoice, InvoiceItem, addInvoice, updateInvoice } from 'src/store/features/invoiceSlice';
+import {
+    Purchase,
+    PurchaseItem,
+    addPurchase,
+    updatePurchase,
+} from 'src/store/features/purchaseSlice';
 import { Product, fetchProducts } from 'src/store/features/productSlice';
-import { Customer, fetchCustomers } from 'src/store/features/customerSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
 import { fDate } from 'src/utils/format-time';
 import { v4 as uuidv4 } from 'uuid';
 
-const defaultValues: Invoice = {
-    orderId: '',
-    invoiceId: '',
-    customerId: '',
-    customerName: '',
-    date: new Date().toString(),
+const defaultValues: Purchase = {
+    purchaseId: '',
+    sellerName: '',
+    date: fDate(new Date().toString(), 'yyyy-MM-dd'),
     subTotal: 0,
     discount: 0,
     total: 0,
-    paid: false,
-    invoiceItems: [],
+    purchaseItems: [],
 };
 
-const defaultInvoiceItem: InvoiceItem = {
+const defaultPurchaseItem: PurchaseItem = {
     productId: '',
     productName: '',
     purchasePrice: 0,
-    unitPrice: 0,
-    tax: 0,
-    category: '',
     quantity: 1,
 };
 
 // ----------------------------------------------------------------
 
-type AddInvoiceProps = {
-    invoiceId?: string;
+type AddPurchaseProps = {
+    purchaseId?: string;
     edit?: boolean;
 };
 
-export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
-    const invoices = useAppSelector((state) => state.invoice.invoices);
+export default function AddPurchase({ purchaseId, edit }: AddPurchaseProps) {
+    const purchases = useAppSelector((state) => state.purchase.purchases);
     const products = useAppSelector((state) => state.product.products);
-    const customers = useAppSelector((state) => state.customer.customers);
 
-    const [invoiceValues, setInvoiceValues] = useState<Invoice>(defaultValues);
-    const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
-    const [invoiceItemsValues, setInvoiceItemsValues] = useState<InvoiceItem>(defaultInvoiceItem);
+    const [purchaseValues, setPurchaseValues] = useState<Purchase>(defaultValues);
+    const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([]);
+    const [purchaseItemsValues, setPurchaseItemsValues] =
+        useState<PurchaseItem>(defaultPurchaseItem);
 
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const handleInvoiceChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInvoiceValues({ ...invoiceValues, [event.target.name]: event.target.value });
+    const handlePurchaseChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPurchaseValues({ ...purchaseValues, [event.target.name]: event.target.value });
     };
 
-    const handlePaidChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInvoiceValues({ ...invoiceValues, paid: event.target.checked });
-    };
-
-    const handleInvoiceItemChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInvoiceItemsValues((_invoiceItemsValues: InvoiceItem) => {
+    const handlePurchaseItemChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPurchaseItemsValues((_purchaseItemsValues: PurchaseItem) => {
             const { name, value } = event.target;
-            const duplicatedInvoiceItems = { ..._invoiceItemsValues, [name]: value };
+            const duplicatedPurchaseItems = { ..._purchaseItemsValues, [name]: value };
             if (name === 'productId') {
-                const addedProduct = products.find((product) => product.productId === value);
-                duplicatedInvoiceItems.unitPrice = addedProduct?.unitPrice || 0;
-                duplicatedInvoiceItems.tax = addedProduct?.tax || 0;
+                duplicatedPurchaseItems.purchasePrice =
+                    products.find((product) => product.productId === value)?.purchasePrice || 0;
             }
-            return duplicatedInvoiceItems;
+            return duplicatedPurchaseItems;
         });
     };
 
@@ -94,157 +85,120 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
         event.preventDefault();
         if (edit) {
             dispatch(
-                updateInvoice({ ...invoiceValues, invoiceItems, invoiceId: invoiceId as string })
+                updatePurchase({
+                    ...purchaseValues,
+                    purchaseItems,
+                    purchaseId: purchaseId as string,
+                })
             );
         } else {
-            dispatch(addInvoice({ ...invoiceValues, invoiceId: uuidv4(), invoiceItems }));
+            dispatch(addPurchase({ ...purchaseValues, purchaseId: uuidv4(), purchaseItems }));
         }
         router.back();
     };
 
     const handleRemoveItem = (productId: string) => {
-        setInvoiceItems((_invoiceItems: InvoiceItem[]) =>
-            _invoiceItems.filter((item: InvoiceItem) => item.productId !== productId)
+        setPurchaseItems((_purchaseItems: PurchaseItem[]) =>
+            _purchaseItems.filter((item: PurchaseItem) => item.productId !== productId)
         );
     };
 
-    const handleAddInvoiceItem = () => {
-        if (invoiceItemsValues.productId && invoiceItemsValues.quantity) {
-            setInvoiceItems((_invoiceItems: InvoiceItem[]) => [
-                ..._invoiceItems,
+    const handleAddPurchaseItem = () => {
+        if (purchaseItemsValues.productId && purchaseItemsValues.quantity) {
+            setPurchaseItems((_purchaseItems: PurchaseItem[]) => [
+                ..._purchaseItems,
                 {
-                    productId: invoiceItemsValues.productId,
+                    productId: purchaseItemsValues.productId,
                     productName: products.find(
-                        (product) => product.productId === invoiceItemsValues.productId
+                        (product) => product.productId === purchaseItemsValues.productId
                     )?.name as string,
-                    purchasePrice: invoiceItemsValues.purchasePrice,
-                    unitPrice: invoiceItemsValues.unitPrice,
-                    tax: invoiceItemsValues.tax,
-                    category: invoiceItemsValues.category,
-                    quantity: invoiceItemsValues.quantity,
+                    purchasePrice: purchaseItemsValues.purchasePrice,
+                    quantity: purchaseItemsValues.quantity,
                 },
             ]);
-            setInvoiceItemsValues(defaultInvoiceItem);
+            setPurchaseItemsValues(defaultPurchaseItem);
         }
     };
 
     useEffect(() => {
-        if (edit && invoiceId && invoices) {
-            const invoice = invoices.find(
-                (_invoice) => _invoice.invoiceId === invoiceId
-            ) as Invoice;
-            if (invoice) {
-                setInvoiceValues(invoice);
-                setInvoiceItems(invoice.invoiceItems);
+        if (edit && purchaseId && purchases) {
+            const purchase = purchases.find(
+                (_purchase) => _purchase.purchaseId === purchaseId
+            ) as Purchase;
+            if (purchase) {
+                setPurchaseValues(purchase);
+                setPurchaseItems(purchase.purchaseItems);
             }
         }
-    }, [edit, invoiceId, invoices]);
+    }, [edit, purchaseId, purchases]);
 
     useEffect(() => {
         dispatch(fetchProducts());
-        dispatch(fetchCustomers());
     }, [dispatch]);
 
     useEffect(() => {
-        setInvoiceValues((_invoiceItems) => ({
-            ..._invoiceItems,
-            total: _invoiceItems.subTotal - _invoiceItems.discount,
+        setPurchaseValues((_purchaseItems) => ({
+            ..._purchaseItems,
+            total: _purchaseItems.subTotal - _purchaseItems.discount,
         }));
-    }, [invoiceValues.discount]);
+    }, [purchaseValues.discount]);
 
     useEffect(() => {
-        setInvoiceValues((_invoiceValues) => {
-            const subTotal = invoiceItems.reduce(
-                (acc, item) => acc + item.unitPrice * item.quantity,
+        setPurchaseValues((_purchaseValues) => {
+            const subTotal = purchaseItems.reduce(
+                (acc, item) => acc + item.purchasePrice * item.quantity,
                 0
             );
             return {
-                ..._invoiceValues,
+                ..._purchaseValues,
                 subTotal,
-                total: subTotal - _invoiceValues.discount,
+                total: subTotal - _purchaseValues.discount,
             };
         });
-    }, [invoiceItems]);
+    }, [purchaseItems]);
 
     const filteredProducts = useMemo(
         () =>
             products.filter(
                 (product: Product) =>
-                    invoiceItems.findIndex(
-                        (invoiceItem: InvoiceItem) => product.productId === invoiceItem.productId
+                    purchaseItems.findIndex(
+                        (purchaseItem: PurchaseItem) => product.productId === purchaseItem.productId
                     ) === -1
             ),
-        [invoiceItems, products]
+        [purchaseItems, products]
     );
 
     return (
         <Container>
-            <Title title={edit ? 'Edit Invoice' : 'Add Invoice'} />
+            <Title title={edit ? 'Edit Purchase' : 'Add Purchase'} />
             <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
                     <Grid item xs={6} md={6}>
                         <TextField
-                            id="orderId"
-                            name="orderId"
-                            label="Order ID"
+                            id="sellerName"
+                            name="sellerName"
+                            label="Seller Name"
                             variant="standard"
                             fullWidth
                             size="small"
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            defaultValue={invoiceValues.orderId}
+                            value={purchaseValues.sellerName}
+                            onChange={handlePurchaseChange}
                         />
                     </Grid>
                     <Grid item xs={6} md={6}>
                         <TextField
                             id="date"
                             name="date"
-                            label="Invoice Date"
+                            label="Purchase Date"
                             variant="standard"
                             fullWidth
                             size="small"
-                            InputProps={{
-                                readOnly: true,
-                            }}
+                            type="date"
                             InputLabelProps={{
                                 shrink: true,
                             }}
-                            defaultValue={fDate(invoiceValues.date)}
-                        />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                        <TextField
-                            id="customerName"
-                            name="customerName"
-                            label="Customer"
-                            variant="standard"
-                            select
-                            fullWidth
-                            size="small"
-                            value={invoiceValues.customerName}
-                            onChange={handleInvoiceChange}
-                        >
-                            {customers.map((customer: Customer) => (
-                                <MenuItem key={customer.customerId} value={customer.name}>
-                                    {customer.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    name="paid"
-                                    checked={invoiceValues.paid}
-                                    onChange={handlePaidChange}
-                                />
-                            }
-                            label="Paid"
+                            value={purchaseValues.date}
+                            onChange={handlePurchaseChange}
                         />
                     </Grid>
                 </Grid>
@@ -253,25 +207,26 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                         <TableHead>
                             <TableRow>
                                 <TableCell sx={{ pl: 0 }}>Product Name</TableCell>
-                                <TableCell align="right">Price</TableCell>
-                                <TableCell align="right">Tax</TableCell>
+                                <TableCell align="right">Purchase Price</TableCell>
                                 <TableCell align="right">Qty</TableCell>
                                 <TableCell align="right">Total</TableCell>
                                 <TableCell sx={{ px: 0 }} />
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {invoiceItems.map((invoiceItem: InvoiceItem) => (
-                                <TableRow key={invoiceItem.productId} hover>
-                                    <TableCell sx={{ pl: 0 }}>{invoiceItem.productName}</TableCell>
-                                    <TableCell align="right">{invoiceItem.unitPrice}</TableCell>
-                                    <TableCell align="right">{invoiceItem.quantity}</TableCell>
+                            {purchaseItems.map((purchaseItem: PurchaseItem) => (
+                                <TableRow key={purchaseItem.productId} hover>
+                                    <TableCell sx={{ pl: 0 }}>{purchaseItem.productName}</TableCell>
                                     <TableCell align="right">
-                                        {invoiceItem.unitPrice * invoiceItem.quantity}
+                                        {purchaseItem.purchasePrice}
+                                    </TableCell>
+                                    <TableCell align="right">{purchaseItem.quantity}</TableCell>
+                                    <TableCell align="right">
+                                        {purchaseItem.purchasePrice * purchaseItem.quantity}
                                     </TableCell>
                                     <TableCell align="right" sx={{ px: 0 }}>
                                         <IconButton
-                                            onClick={() => handleRemoveItem(invoiceItem.productId)}
+                                            onClick={() => handleRemoveItem(purchaseItem.productId)}
                                         >
                                             <Iconify icon="eva:trash-2-fill" />
                                         </IconButton>
@@ -291,8 +246,8 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                         variant="standard"
                                         select
                                         fullWidth
-                                        value={invoiceItemsValues.productId}
-                                        onChange={handleInvoiceItemChange}
+                                        value={purchaseItemsValues.productId}
+                                        onChange={handlePurchaseItemChange}
                                     >
                                         {filteredProducts.map((product: Product) => (
                                             <MenuItem
@@ -306,26 +261,14 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                 </TableCell>
                                 <TableCell>
                                     <TextField
-                                        id="unitPrice"
-                                        name="unitPrice"
+                                        id="purchasePrice"
+                                        name="purchasePrice"
                                         label="Price"
                                         variant="standard"
                                         type="number"
                                         fullWidth
-                                        value={invoiceItemsValues.unitPrice}
-                                        onChange={handleInvoiceItemChange}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <TextField
-                                        id="tax"
-                                        name="tax"
-                                        label="Tax"
-                                        variant="standard"
-                                        type="number"
-                                        fullWidth
-                                        value={invoiceItemsValues.tax}
-                                        onChange={handleInvoiceItemChange}
+                                        value={purchaseItemsValues.purchasePrice}
+                                        onChange={handlePurchaseItemChange}
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -336,15 +279,16 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                         variant="standard"
                                         type="number"
                                         fullWidth
-                                        value={invoiceItemsValues.quantity}
-                                        onChange={handleInvoiceItemChange}
+                                        value={purchaseItemsValues.quantity}
+                                        onChange={handlePurchaseItemChange}
                                     />
                                 </TableCell>
                                 <TableCell align="right">
-                                    {invoiceItemsValues.unitPrice * invoiceItemsValues.quantity}
+                                    {purchaseItemsValues.purchasePrice *
+                                        purchaseItemsValues.quantity}
                                 </TableCell>
                                 <TableCell align="right" sx={{ px: 0 }}>
-                                    <IconButton onClick={handleAddInvoiceItem}>
+                                    <IconButton onClick={handleAddPurchaseItem}>
                                         <Iconify icon="eva:plus-circle-outline" />
                                     </IconButton>
                                 </TableCell>
@@ -353,7 +297,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                 <TableCell align="right" colSpan={3}>
                                     Sub total
                                 </TableCell>
-                                <TableCell align="right">{invoiceValues.subTotal}</TableCell>
+                                <TableCell align="right">{purchaseValues.subTotal}</TableCell>
                                 <TableCell sx={{ px: 0 }} />
                             </TableRow>
                             <TableRow>
@@ -369,8 +313,8 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                         type="number"
                                         fullWidth
                                         size="small"
-                                        value={invoiceValues.discount}
-                                        onChange={handleInvoiceChange}
+                                        value={purchaseValues.discount}
+                                        onChange={handlePurchaseChange}
                                     />
                                 </TableCell>
                             </TableRow>
@@ -378,7 +322,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                 <TableCell align="right" colSpan={3}>
                                     Total
                                 </TableCell>
-                                <TableCell align="right">{invoiceValues.total}</TableCell>
+                                <TableCell align="right">{purchaseValues.total}</TableCell>
                                 <TableCell sx={{ px: 0 }} />
                             </TableRow>
                         </TableBody>

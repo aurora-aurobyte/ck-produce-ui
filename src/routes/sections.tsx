@@ -23,6 +23,10 @@ export const InvoicesPage = lazy(() => import('src/pages/invoices'));
 export const InvoicesAddPage = lazy(() => import('src/pages/invoices-add'));
 export const InvoicesEditPage = lazy(() => import('src/pages/invoices-edit'));
 
+export const PurchasesPage = lazy(() => import('src/pages/purchases'));
+export const PurchasesAddPage = lazy(() => import('src/pages/purchases-add'));
+export const PurchasesEditPage = lazy(() => import('src/pages/purchases-edit'));
+
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -43,7 +47,8 @@ export default function Router() {
                 </DashboardLayout>
             ),
             children: [
-                { element: <IndexPage />, index: true },
+                // { element: <IndexPage />, index: true },
+                { element: <Navigate to="/products" replace />, index: true },
                 {
                     path: 'customers',
                     children: [
@@ -75,6 +80,14 @@ export default function Router() {
                         { element: <InvoicesPage />, index: true },
                         { path: 'add', element: <InvoicesAddPage /> },
                         { path: 'edit/:invoiceId', element: <InvoicesEditPage /> },
+                    ],
+                },
+                {
+                    path: 'purchases',
+                    children: [
+                        { element: <PurchasesPage />, index: true },
+                        { path: 'add', element: <PurchasesAddPage /> },
+                        { path: 'edit/:purchaseId', element: <PurchasesEditPage /> },
                     ],
                 },
                 { path: 'blog', element: <BlogPage /> },

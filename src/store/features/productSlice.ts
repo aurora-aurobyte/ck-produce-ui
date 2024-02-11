@@ -3,7 +3,9 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 export interface Product {
     productId: string;
     name: string;
+    purchasePrice: number;
     unitPrice: number;
+    tax: number;
     categoryId: string;
     description: string;
     categoryName: string;
@@ -42,23 +44,15 @@ export const productSlice = createSlice({
             }
             localStorage.setItem('products', JSON.stringify(state.products));
         },
-        updateProduct: (
-            state,
-            action: PayloadAction<{
-                productId: string;
-                name: string;
-                unitPrice: number;
-                categoryId: string;
-                categoryName: string;
-                description: string;
-            }>
-        ) => {
+        updateProduct: (state, action: PayloadAction<Product>) => {
             const product = state.products.find(
                 (_product: Product) => _product.productId === action.payload.productId
             );
             if (product) {
                 product.name = action.payload.name;
+                product.purchasePrice = action.payload.purchasePrice;
                 product.unitPrice = action.payload.unitPrice;
+                product.tax = action.payload.tax;
                 product.categoryId = action.payload.categoryId;
                 product.categoryName = action.payload.categoryName;
                 product.description = action.payload.description;

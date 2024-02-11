@@ -17,7 +17,9 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 interface IFormInput {
     productId: string;
     name: string;
+    purchasePrice: number;
     unitPrice: number;
+    tax: number;
     categoryId: string;
     categoryName: string;
     description: string;
@@ -37,7 +39,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
         register,
         handleSubmit,
         setValue,
-        getValues,
+        // getValues,
         watch,
         formState: { errors },
     } = useForm<IFormInput>({
@@ -63,6 +65,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
 
         setValue('name', val.name);
         setValue('productId', val.productId);
+        setValue('purchasePrice', val.purchasePrice);
         setValue('unitPrice', val.unitPrice);
         setValue('categoryName', val.categoryName);
         setValue('categoryId', val.categoryId);
@@ -95,7 +98,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                     <Grid item xs={12} md={6}>
                         <TextField
                             id="unitPrice"
-                            label="Product Price"
+                            label="Unit Price"
                             variant="standard"
                             type="number"
                             fullWidth
@@ -108,6 +111,42 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                             })}
                             error={!!errors.unitPrice}
                             helperText={errors.unitPrice?.message}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <TextField
+                            id="purchasePrice"
+                            label="Purchase Price"
+                            variant="standard"
+                            type="number"
+                            fullWidth
+                            {...register('purchasePrice', {
+                                required: 'This is required',
+                                min: {
+                                    value: 0,
+                                    message: 'Purchase price minimum is 0.',
+                                },
+                            })}
+                            error={!!errors.purchasePrice}
+                            helperText={errors.purchasePrice?.message}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <TextField
+                            id="tax"
+                            label="Tax (%)"
+                            variant="standard"
+                            type="number"
+                            fullWidth
+                            {...register('tax', {
+                                required: 'This is required',
+                                min: {
+                                    value: 0,
+                                    message: 'Tax minimum is 0.',
+                                },
+                            })}
+                            error={!!errors.tax}
+                            helperText={errors.tax?.message}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -125,7 +164,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                                 })}
                                 error={!!errors.categoryId}
                                 // helperText={errors.categoryId?.message}
-                                defaultValue={getValues('categoryId') || categories?.[0].categoryId}
+                                // defaultValue={getValues('categoryId') || categories?.[0].categoryId}
                                 // onChange={handleSelectChange}
                             >
                                 {categories.map((item) => (
