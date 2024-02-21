@@ -31,6 +31,7 @@ import CreateInvoice from './create-invoice';
 
 const defaultValues: Order = {
     orderId: '',
+    customerId: '',
     customerName: '',
     date: new Date().toString(),
     subTotal: 0,
@@ -133,10 +134,15 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
         const newInvoiceId = uuidv4();
         dispatch(
             addInvoice({
-                ...orderValues,
+                orderId: orderValues.orderId,
+                customerId: orderValues.customerId,
+                customerName: orderValues.customerName,
                 invoiceId: newInvoiceId,
-                customerId: '',
                 paid: false,
+                subTotal: 0,
+                discount: 0,
+                total: 0,
+                date: new Date().toString(),
                 invoiceItems: orderItems
                     .filter((_, index: number) => selected.includes(index))
                     .map((orderItem) => ({

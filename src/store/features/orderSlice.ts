@@ -12,6 +12,7 @@ export interface OrderItem {
 export interface Order {
     orderId: string;
     date: string;
+    customerId: string;
     customerName: string;
     subTotal: number;
     discount: number;

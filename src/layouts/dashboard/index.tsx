@@ -32,7 +32,7 @@ export default function DashboardLayout({ children }: prop) {
 
                 <Main sx={{ mb: '72px' }}>{children}</Main>
             </Box>
-            <BottomNavigationBar />
+            <BottomNavigationBar toggleNav={() => setOpenNav((open: boolean) => !open)} />
         </>
     );
 }
