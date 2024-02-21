@@ -35,11 +35,15 @@ export default function ViewInvoices() {
                         label: 'Status',
                         render: (row: Invoice) => (
                             <>
-                                {row.paid ? <Chip  label="Pending" color="error" />:
-                                <Chip sx={{width:"71.71px"}} label="Paid" color="success" />}
+                                {row.paid ? (
+                                    <Chip sx={{ width: '71.71px' }} label="Paid" color="success" />
+                                ) : (
+                                    <Chip label="Pending" color="error" />
+                                )}
                             </>
                         ),
                     },
+                    { id: 'total', label: 'Total ($)' },
                 ]}
                 editPage={(row: Invoice) => `/invoices/edit/${row.invoiceId}`}
                 onRemoveClick={handleDeleteClick}

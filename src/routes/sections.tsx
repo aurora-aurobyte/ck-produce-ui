@@ -51,8 +51,7 @@ export default function Router() {
                 </DashboardLayout>
             ),
             children: [
-                // { element: <IndexPage />, index: true },
-                { element: <Navigate to="/products" replace />, index: true },
+                { element: <IndexPage />, index: true },
                 {
                     path: 'customers',
                     children: [
