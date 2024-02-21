@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { Invoice, fetchInvoices, removeInvoice } from 'src/store/features/invoiceSlice';
 import { useEffect } from 'react';
 import { fDate } from 'src/utils/format-time';
+import { Chip } from '@mui/material';
 
 export default function ViewInvoices() {
     const invoices = useAppSelector((state) => state.invoice.invoices);
@@ -31,11 +32,12 @@ export default function ViewInvoices() {
                     { id: 'date', label: 'Date', render: (row: Invoice) => fDate(row.date) },
                     {
                         id: 'paid',
-                        label: 'Paid',
+                        label: 'Status',
                         render: (row: Invoice) => (
-                            <span style={{ color: row.paid ? 'green' : 'red' }}>
-                                {row.paid ? 'Paid' : 'Pending'}
-                            </span>
+                            <>
+                                {row.paid ? <Chip  label="Pending" color="error" />:
+                                <Chip sx={{width:"71.71px"}} label="Paid" color="success" />}
+                            </>
                         ),
                     },
                 ]}

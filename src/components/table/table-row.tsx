@@ -66,9 +66,10 @@ export default function TableRow<T>({
                 ))}
 
                 <TableCell align="right">
+                    {(editPage||onRemoveClick)&&
                     <IconButton onClick={handleOpenMenu}>
                         <Iconify icon="eva:more-vertical-fill" />
-                    </IconButton>
+                    </IconButton>}
                 </TableCell>
             </MuiTableRow>
 
@@ -82,15 +83,15 @@ export default function TableRow<T>({
                     sx: { width: 140 },
                 }}
             >
-                <MenuItem onClick={handleCloseMenu} component={RouterLink} to={editPageUrl}>
+                {editPage&&<MenuItem onClick={handleCloseMenu} component={RouterLink} to={editPageUrl}>
                     <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
                     Edit
-                </MenuItem>
+                </MenuItem>}
 
-                <MenuItem onClick={handleRemoveClick} sx={{ color: 'error.main' }}>
+                {onRemoveClick&&<MenuItem onClick={handleRemoveClick} sx={{ color: 'error.main' }}>
                     <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
                     Delete
-                </MenuItem>
+                </MenuItem>}
             </Popover>
         </>
     );

@@ -196,7 +196,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                             InputLabelProps={{
                                 shrink: true,
                             }}
-                            defaultValue={invoiceValues.orderId}
+                            value={invoiceValues.orderId}
                         />
                     </Grid>
                     <Grid item xs={6} md={6}>
