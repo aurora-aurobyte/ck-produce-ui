@@ -71,7 +71,17 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
     const router = useRouter();
 
     const handleOrderChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setOrderValues({ ...orderValues, [event.target.name]: event.target.value });
+        if (event.target.name === 'customerId') {
+            setOrderValues({
+                ...orderValues,
+                [event.target.name]: event.target.value,
+                customerName:
+                    customers.find((customer) => customer.customerId === event.target.value)
+                        ?.name || '',
+            });
+        } else {
+            setOrderValues({ ...orderValues, [event.target.name]: event.target.value });
+        }
     };
 
     const handleOrderItemChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -247,17 +257,17 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                id="customerName"
-                                name="customerName"
+                                id="customerId"
+                                name="customerId"
                                 label="Customer"
                                 variant="standard"
                                 select
                                 fullWidth
-                                value={orderValues.customerName}
+                                value={orderValues.customerId}
                                 onChange={handleOrderChange}
                             >
                                 {customers.map((customer: Customer) => (
-                                    <MenuItem key={customer.customerId} value={customer.name}>
+                                    <MenuItem key={customer.customerId} value={customer.customerId}>
                                         {customer.name}
                                     </MenuItem>
                                 ))}
