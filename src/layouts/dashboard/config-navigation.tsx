@@ -23,14 +23,14 @@ const navConfig = [
         icon: icon('ic_cart'),
     },
     {
-        title: 'customer',
-        path: '/customers',
-        icon: icon('ic_cart'),
-    },
-    {
         title: 'category',
         path: '/categories',
         icon: icon('ic_blog'),
+    },
+    {
+        title: 'customer',
+        path: '/customers',
+        icon: icon('ic_user'),
     },
     {
         title: 'order',
@@ -45,6 +45,16 @@ const navConfig = [
     {
         title: 'purchase',
         path: '/purchases',
+        icon: icon('ic_cart'),
+    },
+    {
+        title: 'to buy',
+        path: '/toBuy',
+        icon: icon('ic_cart'),
+    },
+    {
+        title: 'pending payment',
+        path: '/pendingPayments',
         icon: icon('ic_cart'),
     },
     // {
