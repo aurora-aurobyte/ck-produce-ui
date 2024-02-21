@@ -5,6 +5,7 @@ import orderReducer from './features/orderSlice';
 import invoiceReducer from './features/invoiceSlice';
 import categoryReducer from './features/categorySlice';
 import purchaseReducer from './features/purchaseSlice';
+import toBuyReducer from './features/toBuySlice';
 
 export const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
         invoice: invoiceReducer,
         category: categoryReducer,
         purchase: purchaseReducer,
+        toBuy: toBuyReducer,
     },
 });
 
