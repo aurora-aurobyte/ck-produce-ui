@@ -6,11 +6,13 @@ export interface OrderItem {
     unitPrice: number;
     category: string;
     quantity: number;
+    delivered: boolean;
 }
 
 export interface Order {
     orderId: string;
     date: string;
+    customerId: string;
     customerName: string;
     subTotal: number;
     discount: number;

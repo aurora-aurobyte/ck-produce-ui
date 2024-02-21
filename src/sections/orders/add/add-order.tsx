@@ -31,6 +31,7 @@ import CreateInvoice from './create-invoice';
 
 const defaultValues: Order = {
     orderId: '',
+    customerId: '',
     customerName: '',
     date: new Date().toString(),
     subTotal: 0,
@@ -45,6 +46,7 @@ const defaultOrderItem: OrderItem = {
     unitPrice: 0,
     category: '',
     quantity: 1,
+    delivered: false,
 };
 
 // ----------------------------------------------------------------
@@ -112,6 +114,7 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                     unitPrice: orderItemsValues.unitPrice,
                     category: orderItemsValues.category,
                     quantity: orderItemsValues.quantity,
+                    delivered: false,
                 },
             ]);
             setOrderItemsValues(defaultOrderItem);
@@ -131,10 +134,15 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
         const newInvoiceId = uuidv4();
         dispatch(
             addInvoice({
-                ...orderValues,
+                orderId: orderValues.orderId,
+                customerId: orderValues.customerId,
+                customerName: orderValues.customerName,
                 invoiceId: newInvoiceId,
-                customerId: '',
                 paid: false,
+                subTotal: 0,
+                discount: 0,
+                total: 0,
+                date: new Date().toString(),
                 invoiceItems: orderItems
                     .filter((_, index: number) => selected.includes(index))
                     .map((orderItem) => ({
@@ -148,6 +156,20 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                     })),
             })
         );
+
+        const items = orderItems.map((orderItem, index) => ({
+            ...orderItem,
+            delivered: selected.includes(index),
+        }));
+
+        dispatch(
+            updateOrder({
+                ...orderValues,
+                orderItems: items,
+                orderId: orderId as string,
+            })
+        );
+
         router.push(`/invoices/edit/${newInvoiceId}`);
     };
 
@@ -371,14 +393,16 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                         <Button variant="contained" color="inherit" type="submit">
                             Save
                         </Button>
-                        <Button
-                            variant="contained"
-                            color="inherit"
-                            type="button"
-                            onClick={handleCreateInvoiceClick}
-                        >
-                            Create Invoice
-                        </Button>
+                        {orderId && (
+                            <Button
+                                variant="contained"
+                                color="inherit"
+                                type="button"
+                                onClick={handleCreateInvoiceClick}
+                            >
+                                Create Invoice
+                            </Button>
+                        )}
                     </Stack>
                 </Box>
             </Container>

@@ -12,9 +12,14 @@ import { RouterLink } from 'src/routes/components';
 // import FavoriteIcon from '@mui/icons-material/Favorite';
 // import LocationOnIcon from '@mui/icons-material/LocationOn';
 
+import SvgColor from 'src/components/svg-color';
 import { bottomNavConfig } from './config-navigation';
 
-export default function BottomNavigationBar() {
+type BottomNavigationBarType = {
+    toggleNav: () => void;
+};
+
+export default function BottomNavigationBar({ toggleNav }: BottomNavigationBarType) {
     const theme = useTheme();
     const [value, setValue] = useState(0);
 
@@ -55,6 +60,19 @@ export default function BottomNavigationBar() {
                             to={item.path}
                         />
                     ))}
+                    <BottomNavigationAction
+                        sx={{
+                            textTransform: 'capitalize',
+                        }}
+                        label="Menu"
+                        icon={
+                            <SvgColor
+                                src="/assets/icons/ic_menu.svg"
+                                sx={{ width: 1, height: 1 }}
+                            />
+                        }
+                        onClick={toggleNav}
+                    />
                 </BottomNavigation>
             </Paper>
         </Box>
