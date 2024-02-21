@@ -40,7 +40,7 @@ export default function AppView() {
                         title="Item Orders"
                         total={234}
                         color="error"
-                        icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
+                        icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
                     />
                 </Grid>
 
@@ -49,7 +49,7 @@ export default function AppView() {
                         title="Revenue"
                         total={12346}
                         color="warning"
-                        icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
+                        icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
                     />
                 </Grid>
 
