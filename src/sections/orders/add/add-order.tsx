@@ -45,6 +45,7 @@ const defaultOrderItem: OrderItem = {
     unitPrice: 0,
     category: '',
     quantity: 1,
+    delivered: false,
 };
 
 // ----------------------------------------------------------------
@@ -112,6 +113,7 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                     unitPrice: orderItemsValues.unitPrice,
                     category: orderItemsValues.category,
                     quantity: orderItemsValues.quantity,
+                    delivered: false,
                 },
             ]);
             setOrderItemsValues(defaultOrderItem);
@@ -148,6 +150,20 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                     })),
             })
         );
+
+        const items = orderItems.map((orderItem, index) => ({
+            ...orderItem,
+            delivered: selected.includes(index),
+        }));
+
+        dispatch(
+            updateOrder({
+                ...orderValues,
+                orderItems: items,
+                orderId: orderId as string,
+            })
+        );
+
         router.push(`/invoices/edit/${newInvoiceId}`);
     };
 
@@ -371,14 +387,16 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                         <Button variant="contained" color="inherit" type="submit">
                             Save
                         </Button>
-                        <Button
-                            variant="contained"
-                            color="inherit"
-                            type="button"
-                            onClick={handleCreateInvoiceClick}
-                        >
-                            Create Invoice
-                        </Button>
+                        {orderId && (
+                            <Button
+                                variant="contained"
+                                color="inherit"
+                                type="button"
+                                onClick={handleCreateInvoiceClick}
+                            >
+                                Create Invoice
+                            </Button>
+                        )}
                     </Stack>
                 </Box>
             </Container>

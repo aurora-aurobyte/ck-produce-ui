@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 import { Product, addProduct, updateProduct } from 'src/store/features/productSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { FormControl, MenuItem } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
@@ -39,7 +39,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
         register,
         handleSubmit,
         setValue,
-        // getValues,
+        getValues,
         watch,
         formState: { errors },
     } = useForm<IFormInput>({
@@ -70,6 +70,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
         setValue('categoryName', val.categoryName);
         setValue('categoryId', val.categoryId);
         setValue('description', val.description);
+        setValue('tax', val.tax);
     }, [productId, products, edit, setValue, categories]);
 
     if (!watch('categoryId') && edit) return 'Loading...';
@@ -151,32 +152,38 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <FormControl fullWidth>
-                            <InputLabel id="label-categoryId-select" variant="standard">
-                                Category
-                            </InputLabel>
-                            <Select
+                            <TextField
                                 id="label-categoryId-select"
+                                select
                                 label="Category"
                                 variant="standard"
                                 fullWidth
                                 {...register('categoryId', {
+                                    onChange: (e) => {
+                                        const categoryId = e.target.value;
+                                        setValue('categoryId', categoryId);
+                                        setValue(
+                                            'categoryName',
+                                            categories.find((c) => c.categoryId === categoryId)
+                                                ?.name || ''
+                                        );
+                                        return categoryId;
+                                    },
                                     required: 'This is required',
                                 })}
                                 error={!!errors.categoryId}
-                                // helperText={errors.categoryId?.message}
-                                // defaultValue={getValues('categoryId') || categories?.[0].categoryId}
-                                // onChange={handleSelectChange}
+                                helperText={errors.categoryId?.message}
+                                defaultValue={getValues('categoryId')}
                             >
                                 {categories.map((item) => (
                                     <MenuItem
                                         key={item.name + item.categoryId}
                                         value={item.categoryId}
-                                        onClick={() => setValue('categoryName', item.name)}
                                     >
                                         {item.name}
                                     </MenuItem>
                                 ))}
-                            </Select>
+                            </TextField>
                         </FormControl>
                     </Grid>
 

@@ -6,6 +6,7 @@ export interface OrderItem {
     unitPrice: number;
     category: string;
     quantity: number;
+    delivered: boolean;
 }
 
 export interface Order {
