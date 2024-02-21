@@ -4,15 +4,15 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import Iconify from 'src/components/iconify';
+// import Iconify from 'src/components/iconify';
 
-import AppTasks from '../app-tasks';
+// import AppTasks from '../app-tasks';
 import AppNewsUpdate from '../app-news-update';
 import AppOrderTimeline from '../app-order-timeline';
 import AppCurrentVisits from '../app-current-visits';
 import AppWebsiteVisits from '../app-website-visits';
 import AppWidgetSummary from '../app-widget-summary';
-import AppTrafficBySite from '../app-traffic-by-site';
+// import AppTrafficBySite from '../app-traffic-by-site';
 import AppCurrentSubject from '../app-current-subject';
 import AppConversionRates from '../app-conversion-rates';
 
@@ -29,7 +29,7 @@ export default function AppView() {
                 <Grid xs={12} sm={6} md={3}>
                     <AppWidgetSummary
                         title="Weekly Sales"
-                        total={714000}
+                        total={4300}
                         color="success"
                         icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
                     />
@@ -37,17 +37,17 @@ export default function AppView() {
 
                 <Grid xs={12} sm={6} md={3}>
                     <AppWidgetSummary
-                        title="New Users"
-                        total={1352831}
-                        color="info"
+                        title="Item Orders"
+                        total={234}
+                        color="error"
                         icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
                     />
                 </Grid>
 
                 <Grid xs={12} sm={6} md={3}>
                     <AppWidgetSummary
-                        title="Item Orders"
-                        total={1723315}
+                        title="Revenue"
+                        total={12346}
                         color="warning"
                         icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
                     />
@@ -55,17 +55,17 @@ export default function AppView() {
 
                 <Grid xs={12} sm={6} md={3}>
                     <AppWidgetSummary
-                        title="Bug Reports"
-                        total={234}
-                        color="error"
+                        title="Pendings"
+                        total={13528}
+                        color="info"
                         icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
                     />
                 </Grid>
 
                 <Grid xs={12} md={6} lg={8}>
                     <AppWebsiteVisits
-                        title="Website Visits"
-                        subheader="(+43%) than last year"
+                        title="Total Transactions"
+                        subheader="(+43%) than last month"
                         // @ts-ignore
                         chart={{
                             labels: [
@@ -83,19 +83,19 @@ export default function AppView() {
                             ],
                             series: [
                                 {
-                                    name: 'Team A',
+                                    name: 'Revenue',
                                     type: 'column',
                                     fill: 'solid',
                                     data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
                                 },
                                 {
-                                    name: 'Team B',
+                                    name: 'Sales',
                                     type: 'area',
                                     fill: 'gradient',
                                     data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
                                 },
                                 {
-                                    name: 'Team C',
+                                    name: 'Payments',
                                     type: 'line',
                                     fill: 'solid',
                                     data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
@@ -107,13 +107,13 @@ export default function AppView() {
 
                 <Grid xs={12} md={6} lg={4}>
                     <AppCurrentVisits
-                        title="Current Visits"
+                        title="Current Sales"
                         chart={{
                             series: [
-                                { label: 'America', value: 4344 },
-                                { label: 'Asia', value: 5435 },
-                                { label: 'Europe', value: 1443 },
-                                { label: 'Africa', value: 4443 },
+                                { label: 'Mushrooms', value: 4344 },
+                                { label: 'Onion', value: 5435 },
+                                { label: 'Potato', value: 1443 },
+                                { label: 'Tomato', value: 4443 },
                             ],
                         }}
                     />
@@ -121,20 +121,20 @@ export default function AppView() {
 
                 <Grid xs={12} md={6} lg={8}>
                     <AppConversionRates
-                        title="Conversion Rates"
-                        subheader="(+43%) than last year"
+                        title="Customer Sales"
+                        subheader="(+43%) than last month"
                         chart={{
                             series: [
-                                { label: 'Italy', value: 400 },
-                                { label: 'Japan', value: 430 },
-                                { label: 'China', value: 448 },
-                                { label: 'Canada', value: 470 },
-                                { label: 'France', value: 540 },
-                                { label: 'Germany', value: 580 },
-                                { label: 'South Korea', value: 690 },
-                                { label: 'Netherlands', value: 1100 },
-                                { label: 'United States', value: 1200 },
-                                { label: 'United Kingdom', value: 1380 },
+                                { label: 'Aravind', value: 400 },
+                                { label: 'Kavitha', value: 430 },
+                                { label: 'Dinesh', value: 448 },
+                                { label: 'Priya', value: 470 },
+                                { label: 'Karthik', value: 540 },
+                                { label: 'Meena', value: 580 },
+                                { label: 'Prakash', value: 690 },
+                                { label: 'Nithya', value: 1100 },
+                                { label: 'Manoj', value: 1200 },
+                                { label: 'Shanthi', value: 1380 },
                             ],
                         }}
                     />
@@ -142,20 +142,20 @@ export default function AppView() {
 
                 <Grid xs={12} md={6} lg={4}>
                     <AppCurrentSubject
-                        title="Current Subject"
+                        title="Sales Pattern"
                         chart={{
                             categories: [
-                                'English',
-                                'History',
-                                'Physics',
-                                'Geography',
-                                'Chinese',
-                                'Math',
+                                'Toronto',
+                                'Vancouver',
+                                'Montreal',
+                                'Calgary',
+                                'Ottawa',
+                                'Edmonton',
                             ],
                             series: [
-                                { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
-                                { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
-                                { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] },
+                                { name: 'Carrots', data: [80, 50, 30, 40, 100, 20] },
+                                { name: 'Broccoli', data: [20, 30, 40, 80, 20, 80] },
+                                { name: 'Bell peppers', data: [44, 76, 78, 13, 43, 10] },
                             ],
                         }}
                     />
@@ -163,11 +163,11 @@ export default function AppView() {
 
                 <Grid xs={12} md={6} lg={8}>
                     <AppNewsUpdate
-                        title="News Update"
+                        title="Recent Notifications"
                         list={[...Array(5)].map((_, index) => ({
                             id: faker.string.uuid(),
-                            title: faker.person.jobTitle(),
-                            description: faker.commerce.productDescription(),
+                            title: faker.finance.transactionType(),
+                            description: faker.finance.transactionDescription(),
                             image: `/assets/images/covers/cover_${index + 1}.jpg`,
                             postedAt: faker.date.recent(),
                         }))}
@@ -180,7 +180,7 @@ export default function AppView() {
                         list={[...Array(5)].map((_, index) => ({
                             id: faker.string.uuid(),
                             title: [
-                                '1983, orders, $4220',
+                                '19, orders, $4220',
                                 '12 Invoices have been paid',
                                 'Order #37745 from September',
                                 'New order placed #XF-2356',
@@ -192,7 +192,7 @@ export default function AppView() {
                     />
                 </Grid>
 
-                <Grid xs={12} md={6} lg={4}>
+                {/* <Grid xs={12} md={6} lg={4}>
                     <AppTrafficBySite
                         title="Traffic by Site"
                         list={[
@@ -237,7 +237,7 @@ export default function AppView() {
                             { id: '5', name: 'Sprint Showcase' },
                         ]}
                     />
-                </Grid>
+                </Grid> */}
             </Grid>
         </Container>
     );
