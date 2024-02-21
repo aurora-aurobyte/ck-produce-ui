@@ -8,7 +8,7 @@ const icon = (name: string) => (
 
 const navConfig = [
     {
-        title: 'dashboard',
+        title: 'home',
         path: '/',
         icon: icon('ic_analytics'),
     },
@@ -76,7 +76,7 @@ const navConfig = [
 
 const bottomNavConfig = [
     {
-        title: 'dashboard',
+        title: 'home',
         path: '/',
         icon: icon('ic_analytics'),
     },
