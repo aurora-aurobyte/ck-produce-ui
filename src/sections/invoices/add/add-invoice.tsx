@@ -155,7 +155,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
     useEffect(() => {
         setInvoiceValues((_invoiceValues) => {
             const subTotal = invoiceItems.reduce(
-                (acc, item) => acc + item.unitPrice * item.quantity,
+                (acc, item) => acc + item.unitPrice * item.quantity * (1 + item.tax/100),
                 0
             );
             return {
@@ -265,9 +265,10 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                 <TableRow key={invoiceItem.productId} hover>
                                     <TableCell sx={{ pl: 0 }}>{invoiceItem.productName}</TableCell>
                                     <TableCell align="right">{invoiceItem.unitPrice}</TableCell>
+                                    <TableCell align="right">{invoiceItem.tax}</TableCell>
                                     <TableCell align="right">{invoiceItem.quantity}</TableCell>
                                     <TableCell align="right">
-                                        {invoiceItem.unitPrice * invoiceItem.quantity}
+                                        {invoiceItem.unitPrice * invoiceItem.quantity * (1 + invoiceItem.tax/100)}
                                     </TableCell>
                                     <TableCell align="right" sx={{ px: 0 }}>
                                         <IconButton
@@ -341,7 +342,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                     />
                                 </TableCell>
                                 <TableCell align="right">
-                                    {invoiceItemsValues.unitPrice * invoiceItemsValues.quantity}
+                                    {invoiceItemsValues.unitPrice * invoiceItemsValues.quantity * (1 + invoiceItemsValues.tax/100)}
                                 </TableCell>
                                 <TableCell align="right" sx={{ px: 0 }}>
                                     <IconButton onClick={handleAddInvoiceItem}>

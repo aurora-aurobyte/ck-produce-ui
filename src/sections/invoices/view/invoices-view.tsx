@@ -29,6 +29,15 @@ export default function ViewInvoices() {
                 columns={[
                     { id: 'customerName', label: 'Customer' },
                     { id: 'date', label: 'Date', render: (row: Invoice) => fDate(row.date) },
+                    {
+                        id: 'paid',
+                        label: 'Paid',
+                        render: (row: Invoice) => (
+                            <span style={{ color: row.paid ? 'green' : 'red' }}>
+                                {row.paid ? 'Paid' : 'Pending'}
+                            </span>
+                        ),
+                    },
                 ]}
                 editPage={(row: Invoice) => `/invoices/edit/${row.invoiceId}`}
                 onRemoveClick={handleDeleteClick}
