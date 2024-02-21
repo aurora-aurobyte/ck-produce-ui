@@ -155,7 +155,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
     useEffect(() => {
         setInvoiceValues((_invoiceValues) => {
             const subTotal = invoiceItems.reduce(
-                (acc, item) => acc + item.unitPrice * item.quantity * (1 + item.tax/100),
+                (acc, item) => acc + item.unitPrice * item.quantity * (1 + item.tax / 100),
                 0
             );
             return {
@@ -213,7 +213,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                             InputLabelProps={{
                                 shrink: true,
                             }}
-                            defaultValue={fDate(invoiceValues.date)}
+                            value={fDate(invoiceValues.date)}
                         />
                     </Grid>
                     <Grid item xs={6} md={6}>
@@ -268,7 +268,9 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                     <TableCell align="right">{invoiceItem.tax}</TableCell>
                                     <TableCell align="right">{invoiceItem.quantity}</TableCell>
                                     <TableCell align="right">
-                                        {invoiceItem.unitPrice * invoiceItem.quantity * (1 + invoiceItem.tax/100)}
+                                        {invoiceItem.unitPrice *
+                                            invoiceItem.quantity *
+                                            (1 + invoiceItem.tax / 100)}
                                     </TableCell>
                                     <TableCell align="right" sx={{ px: 0 }}>
                                         <IconButton
@@ -342,7 +344,9 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                     />
                                 </TableCell>
                                 <TableCell align="right">
-                                    {invoiceItemsValues.unitPrice * invoiceItemsValues.quantity * (1 + invoiceItemsValues.tax/100)}
+                                    {invoiceItemsValues.unitPrice *
+                                        invoiceItemsValues.quantity *
+                                        (1 + invoiceItemsValues.tax / 100)}
                                 </TableCell>
                                 <TableCell align="right" sx={{ px: 0 }}>
                                     <IconButton onClick={handleAddInvoiceItem}>

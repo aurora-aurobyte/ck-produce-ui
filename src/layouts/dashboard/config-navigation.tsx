@@ -75,25 +75,10 @@ const navConfig = [
 ];
 
 const bottomNavConfig = [
-    // {
-    //     title: 'dashboard',
-    //     path: '/',
-    //     icon: icon('ic_analytics'),
-    // },
     {
-        title: 'customer',
-        path: '/customers',
-        icon: icon('ic_user'),
-    },
-    {
-        title: 'product',
-        path: '/products',
-        icon: icon('ic_products'),
-    },
-    {
-        title: 'category',
-        path: '/categories',
-        icon: icon('ic_category'),
+        title: 'dashboard',
+        path: '/',
+        icon: icon('ic_analytics'),
     },
     {
         title: 'order',
@@ -101,9 +86,14 @@ const bottomNavConfig = [
         icon: icon('ic_order'),
     },
     {
-        title: 'purchase',
-        path: '/purchases',
-        icon: icon('ic_purchase'),
+        title: 'invoice',
+        path: '/invoices',
+        icon: icon('ic_invoice'),
+    },
+    {
+        title: 'to buy',
+        path: '/toBuy',
+        icon: icon('ic_buy'),
     },
 ];
 
