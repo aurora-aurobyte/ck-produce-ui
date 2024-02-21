@@ -6,6 +6,7 @@ import invoiceReducer from './features/invoiceSlice';
 import categoryReducer from './features/categorySlice';
 import purchaseReducer from './features/purchaseSlice';
 import toBuyReducer from './features/toBuySlice';
+import pendingPaymentReducer from './features/pendingPaymentSlice';
 
 export const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
         category: categoryReducer,
         purchase: purchaseReducer,
         toBuy: toBuyReducer,
+        pendingPayment: pendingPaymentReducer,
     },
 });
 
