@@ -11,7 +11,7 @@ export default function ViewProducts() {
     const dispatch = useAppDispatch();
 
     const handleDeleteClick = (product: Product) => {
-        dispatch(removeProduct(product.productId));
+        dispatch(removeProduct(product._id));
     };
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export default function ViewProducts() {
                     { id: 'tax', label: 'Tax' },
                     { id: 'description', label: 'Description' },
                 ]}
-                editPage={(row: Product) => `/products/edit/${row.productId}`}
+                editPage={(row: Product) => `/products/edit/${row._id}`}
                 onRemoveClick={handleDeleteClick}
             />
         </Container>

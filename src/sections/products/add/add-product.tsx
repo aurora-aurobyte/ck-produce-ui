@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 interface IFormInput {
-    productId: string;
+    _id: string;
     name: string;
     purchasePrice: number;
     unitPrice: number;
@@ -51,9 +51,9 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
 
     const onSubmit: SubmitHandler<IFormInput> = (values) => {
         if (edit) {
-            dispatch(updateProduct({ ...values, productId: productId as string }));
+            dispatch(updateProduct({ ...values, _id: productId as string }));
         } else {
-            dispatch(addProduct({ ...values, productId: uuidv4() }));
+            dispatch(addProduct({ ...values, _id: uuidv4() }));
         }
         router.back();
     };
@@ -61,13 +61,13 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
     useEffect(() => {
         if (!edit) return;
 
-        const val = products.find((product) => product.productId === productId || '') as Product;
+        const val = products.find((product) => product._id === productId || '') as Product;
 
         setValue('name', val.name);
-        setValue('productId', val.productId);
+        setValue('_id', val._id);
         setValue('purchasePrice', val.purchasePrice);
         setValue('unitPrice', val.unitPrice);
-        setValue('categoryName', val.categoryName);
+        // setValue('categoryName', val.categoryName);
         setValue('categoryId', val.categoryId);
         setValue('description', val.description);
         setValue('tax', val.tax);
@@ -164,8 +164,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                                         setValue('categoryId', categoryId);
                                         setValue(
                                             'categoryName',
-                                            categories.find((c) => c.categoryId === categoryId)
-                                                ?.name || ''
+                                            categories.find((c) => c._id === categoryId)?.name || ''
                                         );
                                         return categoryId;
                                     },
@@ -176,10 +175,7 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                                 defaultValue={getValues('categoryId')}
                             >
                                 {categories.map((item) => (
-                                    <MenuItem
-                                        key={item.name + item.categoryId}
-                                        value={item.categoryId}
-                                    >
+                                    <MenuItem key={item.name + item._id} value={item._id}>
                                         {item.name}
                                     </MenuItem>
                                 ))}

@@ -1,14 +1,15 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { Category } from './categorySlice';
 
 export interface Product {
-    productId: string;
+    _id: string;
     name: string;
     purchasePrice: number;
     unitPrice: number;
     tax: number;
     categoryId: string;
+    category?: Category;
     description: string;
-    categoryName: string;
 }
 
 interface ProductState {
@@ -46,7 +47,7 @@ export const productSlice = createSlice({
         },
         updateProduct: (state, action: PayloadAction<Product>) => {
             const product = state.products.find(
-                (_product: Product) => _product.productId === action.payload.productId
+                (_product: Product) => _product._id === action.payload._id
             );
             if (product) {
                 product.name = action.payload.name;
@@ -54,14 +55,14 @@ export const productSlice = createSlice({
                 product.unitPrice = action.payload.unitPrice;
                 product.tax = action.payload.tax;
                 product.categoryId = action.payload.categoryId;
-                product.categoryName = action.payload.categoryName;
+                product.category = action.payload.category;
                 product.description = action.payload.description;
             }
             localStorage.setItem('products', JSON.stringify(state.products));
         },
         removeProduct: (state, action: PayloadAction<string>) => {
             const index = state.products.findIndex(
-                (product: Product) => product.productId === action.payload
+                (product: Product) => product._id === action.payload
             );
             if (index > -1) {
                 state.products.splice(index, 1);
