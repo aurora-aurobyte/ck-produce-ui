@@ -20,6 +20,9 @@ import { useResponsive } from 'src/hooks/use-responsive';
 import Logo from 'src/components/logo';
 import Scrollbar from 'src/components/scrollbar';
 
+import { logout } from 'src/store/features/authSlice';
+import { useAppDispatch } from 'src/store/hooks';
+
 import { NAV } from './config-layout';
 import navConfig from './config-navigation';
 
@@ -32,6 +35,7 @@ type props = {
 
 export default function Nav({ openNav, onCloseNav }: props) {
     const pathname = usePathname();
+    const dispatch = useAppDispatch();
 
     const upLg = useResponsive('up', 'lg', null);
 
@@ -72,6 +76,23 @@ export default function Nav({ openNav, onCloseNav }: props) {
             {navConfig.map((item) => (
                 <NavItem key={item.title} item={item} />
             ))}
+            <ListItemButton
+                sx={{
+                    minHeight: 44,
+                    borderRadius: 0.75,
+                    typography: 'body2',
+                    color: 'text.secondary',
+                    textTransform: 'capitalize',
+                    fontWeight: 'fontWeightMedium',
+                }}
+                onClick={() => {
+                    dispatch(logout());
+                }}
+            >
+                {/* <Box component="span" sx={{ width: 24, height: 24, mr: 2 }}></Box> */}
+
+                <Box component="span">Logout</Box>
+            </ListItemButton>
         </Stack>
     );
 

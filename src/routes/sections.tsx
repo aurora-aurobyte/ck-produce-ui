@@ -1,7 +1,9 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import DashboardLayout from 'src/layouts/dashboard';
+import { verifyUser } from 'src/store/features/authSlice';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
@@ -41,7 +43,25 @@ export const CategoriesEditPage = lazy(() => import('src/pages/categories-edit')
 // ----------------------------------------------------------------------
 
 export default function Router() {
-    const routes = useRoutes([
+    const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(verifyUser());
+    }, [dispatch]);
+
+    const loadingComponent = <Suspense />;
+    const publicRoutes = [
+        {
+            path: 'login',
+            element: <LoginPage />,
+        },
+        {
+            path: '*',
+            element: <Navigate to="/login" />,
+        },
+    ];
+    const privateRoutes = [
         {
             element: (
                 <DashboardLayout>
@@ -124,7 +144,11 @@ export default function Router() {
             path: '*',
             element: <Navigate to="/404" replace />,
         },
-    ]);
+    ];
+    const routes = useRoutes(isAuthenticated ? privateRoutes : publicRoutes);
 
+    if (loading) {
+        return loadingComponent;
+    }
     return routes;
 }

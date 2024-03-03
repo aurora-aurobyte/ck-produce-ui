@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { RootState } from '../store';
 
 export interface Category {
-    categoryId: string;
+    _id: string;
     name: string;
 }
 
@@ -13,19 +15,21 @@ interface CategoryState {
 
 const initialState: CategoryState = {
     loading: true,
-    categories: JSON.parse(localStorage.getItem('categories') || '[]'),
+    categories: [],
     error: '',
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchCategories = createAsyncThunk<Category[]>(
+export const fetchCategories = createAsyncThunk<Category[], void, { state: RootState }>(
     'category/fetchCategories',
-    () =>
-        new Promise((resolve, _) => {
-            setTimeout(() => {
-                resolve(JSON.parse(localStorage.getItem('categories') || '[]'));
-            }, 200);
-        })
+    (_, { getState }) => {
+        const { accessToken } = getState().auth;
+        return axios
+            .get(`${import.meta.env.VITE_BASE_URL}/categories`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            })
+            .then((response) => response.data);
+    }
 );
 
 export const categorySlice = createSlice({
@@ -46,7 +50,7 @@ export const categorySlice = createSlice({
             }>
         ) => {
             const category = state.categories.find(
-                (_category: Category) => _category.categoryId === action.payload.categoryId
+                (_category: Category) => _category._id === action.payload.categoryId
             );
             if (category) {
                 category.name = action.payload.name;
@@ -55,7 +59,7 @@ export const categorySlice = createSlice({
         },
         removeCategory: (state, action: PayloadAction<string>) => {
             const index = state.categories.findIndex(
-                (category: Category) => category.categoryId === action.payload
+                (category: Category) => category._id === action.payload
             );
             if (index > -1) {
                 state.categories.splice(index, 1);

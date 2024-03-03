@@ -74,7 +74,7 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }: any, ref) => {
           />
         </g>
       </svg> */}
-            <Typography>TK Produce</Typography>
+            <Typography>CK Produce</Typography>
         </Box>
     );
 

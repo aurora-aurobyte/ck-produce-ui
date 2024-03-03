@@ -10,8 +10,8 @@ import Button from '@mui/material/Button';
 import { Category, updateCategory, addCategory } from 'src/store/features/categorySlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
-import { v4 as uuidv4 } from 'uuid';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import axios from 'axios';
 
 interface IFormInput {
     name: string;
@@ -37,24 +37,36 @@ export default function AddCategory({ categoryId, edit }: Readonly<AddCategoryPr
     const router = useRouter();
 
     const categories = useAppSelector((state) => state.category.categories);
+    const accessToken = useAppSelector((state) => state.auth.accessToken);
 
     const onSubmit: SubmitHandler<IFormInput> = (data) => {
         if (edit) {
-            dispatch(updateCategory({ ...data, categoryId: categoryId as string }));
+            axios
+                .put(`${import.meta.env.VITE_BASE_URL}/categories/${categoryId}`, data, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                })
+                .then(() => {
+                    dispatch(updateCategory({ ...data, categoryId: categoryId as string }));
+                    router.push('/categories');
+                });
         } else {
-            dispatch(addCategory({ ...data, categoryId: uuidv4() }));
+            axios
+                .post(`${import.meta.env.VITE_BASE_URL}/categories`, data, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                })
+                .then((response) => {
+                    dispatch(addCategory(response.data));
+                    router.push('/categories');
+                });
         }
-        router.back();
     };
 
     useEffect(() => {
         if (!edit) return;
-        const val = categories.find(
-            (category) => category.categoryId === categoryId || ''
-        ) as Category;
+        const val = categories.find((category) => category._id === categoryId || '') as Category;
 
         setValue('name', val.name);
-        setValue('categoryId', val.categoryId);
+        setValue('categoryId', val._id);
     }, [categoryId, categories, edit, setValue]);
 
     return (

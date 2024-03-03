@@ -1,4 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
+
+import authReducer from './features/authSlice';
 import customerReducer from './features/customerSlice';
 import productReducer from './features/productSlice';
 import orderReducer from './features/orderSlice';
@@ -10,6 +12,7 @@ import pendingPaymentReducer from './features/pendingPaymentSlice';
 
 export const store = configureStore({
     reducer: {
+        auth: authReducer,
         customer: customerReducer,
         product: productReducer,
         order: orderReducer,

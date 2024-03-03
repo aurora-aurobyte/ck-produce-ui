@@ -3,12 +3,12 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 export interface Customer {
     customerId: string;
     name: string;
-    email:string;
-    phoneNo:number;
-    postalCode:number;
-    businessName:string;
+    email: string;
+    phone: string;
+    postalCode: number;
+    businessName: string;
     address: string;
-    balance:number;
+    balance: number;
 }
 
 interface CustomerState {
