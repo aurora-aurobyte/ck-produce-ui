@@ -1,6 +1,7 @@
-import { ChangeEvent, MouseEvent, useState } from 'react';
+import { ChangeEvent, MouseEvent, ReactNode, useState } from 'react';
 
 import Card from '@mui/material/Card';
+import Stack from '@mui/material/Stack';
 import MuiTable from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
@@ -15,6 +16,7 @@ import TableEmptyRows from './table-empty-rows';
 import TableToolbar from './table-toolbar';
 import { emptyRows, applyFilter, getComparator } from './utils';
 import { TableColumn } from './tableColumn';
+import RenderRow from './render-row';
 
 // ----------------------------------------------------------------------
 
@@ -23,14 +25,17 @@ interface TableProps<T> {
     columns: TableColumn<T>[];
     editPage?: (row: T) => string;
     onRemoveClick?: (row: T) => any;
-    // renderRow?: (
-    //     row: T,
-    //     selected: boolean,
-    //     handleClick: (event: ChangeEvent) => void
-    // ) => React.ReactNode;
+    renderRow?: (row: T) => ReactNode;
+    // renderRow?: (row: T, selected: boolean, handleClick: (event: ChangeEvent) => void) => ReactNode;
 }
 
-export default function Table<T>({ data, columns, editPage, onRemoveClick }: TableProps<T>) {
+export default function Table<T>({
+    data,
+    columns,
+    editPage,
+    onRemoveClick,
+    renderRow,
+}: TableProps<T>) {
     const [page, setPage] = useState(0);
 
     const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -99,6 +104,24 @@ export default function Table<T>({ data, columns, editPage, onRemoveClick }: Tab
     });
 
     const notFound = !dataFiltered.length && !!filterName;
+
+    if (renderRow)
+        return (
+            <Scrollbar>
+                <Stack spacing={1}>
+                    {data.map((row: T, index: number) => (
+                        <RenderRow<T>
+                            key={index}
+                            // @ts-ignore
+                            row={row}
+                            editPage={editPage}
+                            onRemoveClick={onRemoveClick}
+                            renderRow={renderRow}
+                        />
+                    ))}
+                </Stack>
+            </Scrollbar>
+        );
 
     return (
         <Card>

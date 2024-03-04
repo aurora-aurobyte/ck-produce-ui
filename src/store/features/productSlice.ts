@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
 import { Category } from './categorySlice';
+import { RootState } from '../store';
 
 export interface Product {
     _id: string;
@@ -10,6 +12,8 @@ export interface Product {
     categoryId: string;
     category?: Category;
     description: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface ProductState {
@@ -20,19 +24,21 @@ interface ProductState {
 
 const initialState: ProductState = {
     loading: true,
-    products: JSON.parse(localStorage.getItem('products') || '[]'),
+    products: [],
     error: '',
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchProducts = createAsyncThunk<Product[]>(
+export const fetchProducts = createAsyncThunk<Product[], void, { state: RootState }>(
     'product/fetchProducts',
-    () =>
-        new Promise((resolve, _) => {
-            setTimeout(() => {
-                resolve(JSON.parse(localStorage.getItem('products') || '[]'));
-            }, 200);
-        })
+    (_, { getState }) => {
+        const { accessToken } = getState().auth;
+        return axios
+            .get(`${import.meta.env.VITE_BASE_URL}/products`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            })
+            .then((response) => response.data);
+    }
 );
 
 export const productSlice = createSlice({

@@ -55,7 +55,8 @@ export default function LoginView() {
                 dispatch(login({ accessToken: response.data.AccessToken as string }));
                 dispatch(verifyUser());
             })
-            .catch((axiosError) => {
+            .catch((axiosError: any) => {
+                console.log(axiosError);
                 setError(axiosError.response.data.message);
                 setLoading(false);
             });
