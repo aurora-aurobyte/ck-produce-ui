@@ -16,12 +16,12 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 interface IFormInput {
     customerId: string;
     name: string;
-    email:string;
-    phoneNo:number;
-    postalCode:number;
-    businessName:string;
+    email: string;
+    phone: string;
+    postalCode: number;
+    businessName: string;
     address: string;
-    balance:number;
+    balance: number;
 }
 // ----------------------------------------------------------------
 
@@ -60,11 +60,11 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
         setValue('name', val.name);
         setValue('customerId', val.customerId);
         setValue('address', val.address);
-        setValue('email', val.email)
-        setValue('phoneNo', val.phoneNo)
-        setValue('postalCode', val.postalCode)
-        setValue('businessName', val.businessName)
-        setValue('balance', val.balance)
+        setValue('email', val.email);
+        setValue('phone', val.phone);
+        setValue('postalCode', val.postalCode);
+        setValue('businessName', val.businessName);
+        setValue('balance', val.balance);
     }, [customerId, customers, edit, setValue]);
 
     return (
@@ -129,15 +129,15 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
                             label="Customer Phone No"
                             variant="standard"
                             fullWidth
-                            {...register('phoneNo', {
+                            {...register('phone', {
                                 required: 'This is required',
                                 maxLength: {
                                     value: 100,
                                     message: 'Category name exceed maximum length.',
                                 },
                             })}
-                            error={!!errors.phoneNo}
-                            helperText={errors.phoneNo?.message}
+                            error={!!errors.phone}
+                            helperText={errors.phone?.message}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>

@@ -36,7 +36,7 @@ export const fetchToBuys = createAsyncThunk<ToBuy[]>(
                         } else {
                             acc.push({
                                 productId: orderItem.productId,
-                                productName: orderItem.productName,
+                                productName: orderItem.product?.name || '',
                                 quantity: orderItem.quantity,
                             });
                         }

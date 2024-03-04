@@ -82,7 +82,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
             const { name, value } = event.target;
             const duplicatedInvoiceItems = { ..._invoiceItemsValues, [name]: value };
             if (name === 'productId') {
-                const addedProduct = products.find((product) => product.productId === value);
+                const addedProduct = products.find((product) => product._id === value);
                 duplicatedInvoiceItems.unitPrice = addedProduct?.unitPrice || 0;
                 duplicatedInvoiceItems.tax = addedProduct?.tax || 0;
             }
@@ -115,7 +115,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                 {
                     productId: invoiceItemsValues.productId,
                     productName: products.find(
-                        (product) => product.productId === invoiceItemsValues.productId
+                        (product) => product._id === invoiceItemsValues.productId
                     )?.name as string,
                     purchasePrice: invoiceItemsValues.purchasePrice,
                     unitPrice: invoiceItemsValues.unitPrice,
@@ -171,7 +171,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
             products.filter(
                 (product: Product) =>
                     invoiceItems.findIndex(
-                        (invoiceItem: InvoiceItem) => product.productId === invoiceItem.productId
+                        (invoiceItem: InvoiceItem) => product._id === invoiceItem.productId
                     ) === -1
             ),
         [invoiceItems, products]
@@ -298,10 +298,7 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                         onChange={handleInvoiceItemChange}
                                     >
                                         {filteredProducts.map((product: Product) => (
-                                            <MenuItem
-                                                key={product.productId}
-                                                value={product.productId}
-                                            >
+                                            <MenuItem key={product._id} value={product._id}>
                                                 {product.name}
                                             </MenuItem>
                                         ))}

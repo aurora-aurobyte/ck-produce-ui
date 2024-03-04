@@ -93,7 +93,7 @@ export default function ProductsForm({
             const duplicatedInvoiceItems = { ..._invoiceItemsValues, [name]: value };
             if (name === 'productId') {
                 duplicatedInvoiceItems.unitPrice =
-                    products.find((product) => product.productId === value)?.unitPrice || 0;
+                    products.find((product) => product._id === value)?.unitPrice || 0;
             }
             return duplicatedInvoiceItems;
         });
@@ -112,7 +112,7 @@ export default function ProductsForm({
                 {
                     productId: formInputValues.productId,
                     productName: products.find(
-                        (product) => product.productId === formInputValues.productId
+                        (product) => product._id === formInputValues.productId
                     )?.name as string,
                     purchasePrice: formInputValues.purchasePrice,
                     unitPrice: formInputValues.unitPrice,
@@ -155,7 +155,7 @@ export default function ProductsForm({
             products.filter(
                 (product: Product) =>
                     formItems.findIndex(
-                        (formItem: FormItem) => product.productId === formItem.productId
+                        (formItem: FormItem) => product._id === formItem.productId
                     ) === -1
             ),
         [formItems, products]
@@ -224,7 +224,7 @@ export default function ProductsForm({
                                 onChange={handleFormInputChange}
                             >
                                 {filteredProducts.map((product: Product) => (
-                                    <MenuItem key={product.productId} value={product.productId}>
+                                    <MenuItem key={product._id} value={product._id}>
                                         {product.name}
                                     </MenuItem>
                                 ))}

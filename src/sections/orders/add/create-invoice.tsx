@@ -151,7 +151,7 @@ export default function CreateInvoice({
                                             scope="row"
                                             padding="none"
                                         >
-                                            {row.productName}
+                                            {row.product?.name}
                                         </TableCell>
                                         <TableCell align="right">{row.quantity}</TableCell>
                                     </TableRow>

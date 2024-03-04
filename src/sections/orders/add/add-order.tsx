@@ -30,21 +30,16 @@ import { v4 as uuidv4 } from 'uuid';
 import CreateInvoice from './create-invoice';
 
 const defaultValues: Order = {
-    orderId: '',
+    _id: '',
     customerId: '',
-    customerName: '',
     date: new Date().toString(),
-    subTotal: 0,
-    discount: 0,
-    total: 0,
     orderItems: [],
+    createdAt: new Date().toString(),
+    updatedAt: new Date().toString(),
 };
 
 const defaultOrderItem: OrderItem = {
     productId: '',
-    productName: '',
-    unitPrice: 0,
-    category: '',
     quantity: 1,
     delivered: false,
 };
@@ -75,9 +70,9 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
             setOrderValues({
                 ...orderValues,
                 [event.target.name]: event.target.value,
-                customerName:
-                    customers.find((customer) => customer.customerId === event.target.value)
-                        ?.name || '',
+                // customerName:
+                //     customers.find((customer) => customer.customerId === event.target.value)
+                //         ?.name || '',
             });
         } else {
             setOrderValues({ ...orderValues, [event.target.name]: event.target.value });
@@ -88,10 +83,10 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
         setOrderItemsValues((_orderItemsValues: OrderItem) => {
             const { name, value } = event.target;
             const duplicatedOrderItems = { ..._orderItemsValues, [name]: value };
-            if (name === 'productId') {
-                duplicatedOrderItems.unitPrice =
-                    products.find((product) => product.productId === value)?.unitPrice || 0;
-            }
+            // if (name === 'productId') {
+            //     duplicatedOrderItems.unitPrice =
+            //         products.find((product) => product.productId === value)?.unitPrice || 0;
+            // }
             return duplicatedOrderItems;
         });
     };
@@ -99,9 +94,9 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
         if (edit) {
-            dispatch(updateOrder({ ...orderValues, orderItems, orderId: orderId as string }));
+            dispatch(updateOrder({ ...orderValues, orderItems, _id: orderId as string }));
         } else {
-            dispatch(addOrder({ ...orderValues, orderId: uuidv4(), orderItems }));
+            dispatch(addOrder({ ...orderValues, orderItems }));
         }
         router.back();
     };
@@ -119,10 +114,10 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                 {
                     productId: orderItemsValues.productId,
                     productName: products.find(
-                        (product) => product.productId === orderItemsValues.productId
+                        (product) => product._id === orderItemsValues.productId
                     )?.name as string,
-                    unitPrice: orderItemsValues.unitPrice,
-                    category: orderItemsValues.category,
+                    // unitPrice: orderItemsValues.unitPrice,
+                    // category: orderItemsValues.category,
                     quantity: orderItemsValues.quantity,
                     delivered: false,
                 },
@@ -144,9 +139,9 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
         const newInvoiceId = uuidv4();
         dispatch(
             addInvoice({
-                orderId: orderValues.orderId,
+                orderId: orderValues._id,
                 customerId: orderValues.customerId,
-                customerName: orderValues.customerName,
+                customerName: '',
                 invoiceId: newInvoiceId,
                 paid: false,
                 subTotal: 0,
@@ -157,13 +152,13 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                     .filter((_, index: number) => selected.includes(index))
                     .map((orderItem) => ({
                         productId: orderItem.productId,
-                        productName: orderItem.productName,
-                        purchasePrice: orderItem.unitPrice,
-                        unitPrice: orderItem.unitPrice,
+                        productName: orderItem.product?.name || '',
+                        purchasePrice: orderItem.product?.purchasePrice ?? 0,
+                        unitPrice: orderItem.product?.unitPrice ?? 0,
                         tax:
-                            products.find((product) => product.productId === orderItem.productId)
-                                ?.tax || 0,
-                        category: orderItem.category,
+                            products.find((product) => product._id === orderItem.productId)?.tax ||
+                            0,
+                        category: '',
                         quantity: orderItem.quantity,
                     })),
             })
@@ -178,7 +173,7 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
             updateOrder({
                 ...orderValues,
                 orderItems: items,
-                orderId: orderId as string,
+                _id: orderId as string,
             })
         );
 
@@ -187,7 +182,7 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
 
     useEffect(() => {
         if (edit && orderId && orders) {
-            const order = orders.find((_order) => _order.orderId === orderId) as Order;
+            const order = orders.find((_order) => _order._id === orderId) as Order;
             if (order) {
                 setOrderValues(order);
                 setOrderItems(order.orderItems);
@@ -200,33 +195,32 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
         dispatch(fetchCustomers());
     }, [dispatch]);
 
-    useEffect(() => {
-        setOrderValues((_orderItems) => ({
-            ..._orderItems,
-            total: _orderItems.subTotal - _orderItems.discount,
-        }));
-    }, [orderValues.discount]);
+    // useEffect(() => {
+    //     setOrderValues((_orderItems) => ({
+    //         ..._orderItems,
+    //     }));
+    // }, [orderValues.discount]);
 
-    useEffect(() => {
-        setOrderValues((_orderValues) => {
-            const subTotal = orderItems.reduce(
-                (acc, item) => acc + item.unitPrice * item.quantity,
-                0
-            );
-            return {
-                ..._orderValues,
-                subTotal,
-                total: subTotal - _orderValues.discount,
-            };
-        });
-    }, [orderItems]);
+    // useEffect(() => {
+    //     setOrderValues((_orderValues) => {
+    //         const subTotal = orderItems.reduce(
+    //             (acc, item) => acc + item.unitPrice * item.quantity,
+    //             0
+    //         );
+    //         return {
+    //             ..._orderValues,
+    //             subTotal,
+    //             total: subTotal - _orderValues.discount,
+    //         };
+    //     });
+    // }, [orderItems]);
 
     const filteredProducts = useMemo(
         () =>
             products.filter(
                 (product: Product) =>
                     orderItems.findIndex(
-                        (orderItem: OrderItem) => product.productId === orderItem.productId
+                        (orderItem: OrderItem) => product._id === orderItem.productId
                     ) === -1
             ),
         [orderItems, products]
@@ -289,12 +283,15 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                                 {orderItems.map((orderItem: OrderItem) => (
                                     <TableRow key={orderItem.productId} hover>
                                         <TableCell sx={{ pl: 0 }}>
-                                            {orderItem.productName}
+                                            {orderItem.product?.name}
                                         </TableCell>
-                                        <TableCell align="right">{orderItem.unitPrice}</TableCell>
+                                        <TableCell align="right">
+                                            {orderItem.product?.unitPrice ?? 0}
+                                        </TableCell>
                                         <TableCell align="right">{orderItem.quantity}</TableCell>
                                         <TableCell align="right">
-                                            {orderItem.unitPrice * orderItem.quantity}
+                                            {(orderItem.product?.unitPrice ?? 0) *
+                                                orderItem.quantity}
                                         </TableCell>
                                         <TableCell align="right" sx={{ px: 0 }}>
                                             <IconButton
@@ -324,10 +321,7 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                                             onChange={handleOrderItemChange}
                                         >
                                             {filteredProducts.map((product: Product) => (
-                                                <MenuItem
-                                                    key={product.productId}
-                                                    value={product.productId}
-                                                >
+                                                <MenuItem key={product._id} value={product._id}>
                                                     {product.name}
                                                 </MenuItem>
                                             ))}
@@ -341,7 +335,7 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                                             variant="standard"
                                             type="number"
                                             fullWidth
-                                            value={orderItemsValues.unitPrice}
+                                            value={orderItemsValues.product?.unitPrice ?? 0}
                                             onChange={handleOrderItemChange}
                                         />
                                     </TableCell>
@@ -358,7 +352,8 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
                                         />
                                     </TableCell>
                                     <TableCell align="right">
-                                        {orderItemsValues.unitPrice * orderItemsValues.quantity}
+                                        {(orderItemsValues.product?.unitPrice ?? 0) *
+                                            orderItemsValues.quantity}
                                     </TableCell>
                                     <TableCell align="right" sx={{ px: 0 }}>
                                         <IconButton onClick={handleAddOrderItem}>

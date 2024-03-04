@@ -11,8 +11,8 @@ import { Product, addProduct, updateProduct } from 'src/store/features/productSl
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
 import { FormControl, MenuItem } from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { Category } from 'src/store/features/categorySlice';
 
 interface IFormInput {
     _id: string;
@@ -21,7 +21,7 @@ interface IFormInput {
     unitPrice: number;
     tax: number;
     categoryId: string;
-    categoryName: string;
+    category: Category;
     description: string;
 }
 
@@ -51,9 +51,11 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
 
     const onSubmit: SubmitHandler<IFormInput> = (values) => {
         if (edit) {
-            dispatch(updateProduct({ ...values, _id: productId as string }));
+            dispatch(
+                updateProduct({ ...values, createdAt: '', updatedAt: '', _id: productId as string })
+            );
         } else {
-            dispatch(addProduct({ ...values, _id: uuidv4() }));
+            dispatch(addProduct({ ...values, createdAt: '', updatedAt: '' }));
         }
         router.back();
     };
@@ -162,10 +164,10 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                                     onChange: (e) => {
                                         const categoryId = e.target.value;
                                         setValue('categoryId', categoryId);
-                                        setValue(
-                                            'categoryName',
-                                            categories.find((c) => c._id === categoryId)?.name || ''
-                                        );
+                                        // setValue(
+                                        //     'categoryName',
+                                        //     categories.find((c) => c._id === categoryId)?.name || ''
+                                        // );
                                         return categoryId;
                                     },
                                     required: 'This is required',

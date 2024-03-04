@@ -1,23 +1,24 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { RootState } from '../store';
+import { Customer } from './customerSlice';
+import { Product } from './productSlice';
 
 export interface OrderItem {
     productId: string;
-    productName: string;
-    unitPrice: number;
-    category: string;
+    product?: Product;
     quantity: number;
     delivered: boolean;
 }
 
 export interface Order {
-    orderId: string;
+    _id: string;
     date: string;
     customerId: string;
-    customerName: string;
-    subTotal: number;
-    discount: number;
-    total: number;
+    customer?: Customer;
     orderItems: OrderItem[];
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface OrderState {
@@ -28,19 +29,21 @@ interface OrderState {
 
 const initialState: OrderState = {
     loading: true,
-    orders: JSON.parse(localStorage.getItem('orders') || '[]'),
+    orders: [],
     error: '',
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchOrders = createAsyncThunk<Order[]>(
+export const fetchOrders = createAsyncThunk<Order[], void, { state: RootState }>(
     'order/fetchOrders',
-    () =>
-        new Promise((resolve, _) => {
-            setTimeout(() => {
-                resolve(JSON.parse(localStorage.getItem('orders') || '[]'));
-            }, 200);
-        })
+    (_, { getState }) => {
+        const { accessToken } = getState().auth;
+        return axios
+            .get(`${import.meta.env.VITE_BASE_URL}/orders`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            })
+            .then((response) => response.data);
+    }
 );
 
 export const orderSlice = createSlice({
@@ -49,28 +52,22 @@ export const orderSlice = createSlice({
     reducers: {
         addOrder: (state, action: PayloadAction<Order>) => {
             if (action.payload) {
-                state.orders.push({
-                    ...action.payload,
-                    orderId: String(state.orders.length + 1),
-                });
+                state.orders.push(action.payload);
             }
             localStorage.setItem('orders', JSON.stringify(state.orders));
         },
         updateOrder: (state, action: PayloadAction<Order>) => {
-            const order = state.orders.find(
-                (_order: Order) => _order.orderId === action.payload.orderId
-            );
+            const order = state.orders.find((_order: Order) => _order._id === action.payload._id);
             if (order) {
                 order.date = action.payload.date;
-                order.customerName = action.payload.customerName;
+                order.customerId = action.payload.customerId;
+                order.customer = action.payload.customer;
                 order.orderItems = action.payload.orderItems;
             }
             localStorage.setItem('orders', JSON.stringify(state.orders));
         },
         removeOrder: (state, action: PayloadAction<string>) => {
-            const index = state.orders.findIndex(
-                (order: Order) => order.orderId === action.payload
-            );
+            const index = state.orders.findIndex((order: Order) => order._id === action.payload);
             if (index > -1) {
                 state.orders.splice(index, 1);
             }
