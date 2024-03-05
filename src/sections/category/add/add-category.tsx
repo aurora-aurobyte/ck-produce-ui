@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Container from 'src/components/container/container';
 import Title from 'src/components/title';
 
@@ -8,14 +7,13 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
 import { Category, updateCategory, addCategory } from 'src/store/features/categorySlice';
-import { useAppDispatch, useAppSelector } from 'src/store/hooks';
+import { useAppDispatch } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import axios from 'axios';
+import categoryService from 'src/http/services/categoryService';
 
 interface IFormInput {
     name: string;
-    categoryId: string;
 }
 
 // ----------------------------------------------------------------
@@ -29,45 +27,39 @@ export default function AddCategory({ categoryId, edit }: Readonly<AddCategoryPr
     const {
         register,
         handleSubmit,
-        setValue,
-        formState: { errors },
-    } = useForm<IFormInput>({ mode: 'onChange' });
+        formState: { errors, isLoading, isSubmitting },
+    } = useForm<IFormInput>({
+        mode: 'onChange',
+        defaultValues: async () => {
+            if (edit) {
+                const category = await categoryService.getCategory(categoryId as string);
+                return {
+                    name: category.name,
+                };
+            }
+            return {
+                name: '',
+            };
+        },
+    });
 
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const categories = useAppSelector((state) => state.category.categories);
-    const accessToken = useAppSelector((state) => state.auth.accessToken);
-
-    const onSubmit: SubmitHandler<IFormInput> = (data) => {
+    const onSubmit: SubmitHandler<IFormInput> = async (data) => {
         if (edit) {
-            axios
-                .put(`${import.meta.env.VITE_BASE_URL}/categories/${categoryId}`, data, {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                })
-                .then(() => {
-                    dispatch(updateCategory({ ...data, categoryId: categoryId as string }));
-                    router.push('/categories');
-                });
+            await categoryService.updateCategory(categoryId as string, data).then(() => {
+                dispatch(updateCategory({ ...data, categoryId: categoryId as string }));
+            });
         } else {
-            axios
-                .post(`${import.meta.env.VITE_BASE_URL}/categories`, data, {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                })
-                .then((response) => {
-                    dispatch(addCategory(response.data));
-                    router.push('/categories');
-                });
+            await categoryService.createCategory(data).then((_data: Category) => {
+                dispatch(addCategory(_data));
+            });
         }
+        router.push('/categories');
     };
 
-    useEffect(() => {
-        if (!edit) return;
-        const val = categories.find((category) => category._id === categoryId || '') as Category;
-
-        setValue('name', val.name);
-        setValue('categoryId', val._id);
-    }, [categoryId, categories, edit, setValue]);
+    if (isLoading) return 'Loading...';
 
     return (
         <Container>
@@ -92,7 +84,13 @@ export default function AddCategory({ categoryId, edit }: Readonly<AddCategoryPr
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <Button variant="contained" color="inherit" type="submit">
+                        <Button
+                            key={`${isSubmitting}`}
+                            variant="contained"
+                            color="inherit"
+                            type="submit"
+                            disabled={isSubmitting}
+                        >
                             Save
                         </Button>
                     </Grid>

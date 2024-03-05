@@ -27,6 +27,8 @@ export default function RenderRow<T>({
     renderRow,
 }: RenderRowProps<T>) {
     const [open, setOpen] = useState<boolean>(false);
+    const [actionPending, setActionPending] = useState(false);
+
     const editPageUrl = useMemo(() => (editPage ? editPage(row) : '#'), [editPage, row]);
 
     const handleOpenMenu = () => {
@@ -37,9 +39,11 @@ export default function RenderRow<T>({
         setOpen(false);
     };
 
-    const handleRemoveClick = () => {
-        if (onRemoveClick) onRemoveClick(row);
+    const handleRemoveClick = async () => {
+        setActionPending(true);
+        if (onRemoveClick) await onRemoveClick(row);
         handleCloseMenu();
+        setActionPending(false);
     };
 
     return (
@@ -50,14 +54,23 @@ export default function RenderRow<T>({
             <Dialog open={!!open} onClose={handleCloseMenu}>
                 <Box>
                     {editPage && (
-                        <MenuItem onClick={handleCloseMenu} component={RouterLink} to={editPageUrl}>
+                        <MenuItem
+                            onClick={handleCloseMenu}
+                            component={RouterLink}
+                            to={editPageUrl}
+                            disabled={actionPending}
+                        >
                             <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
                             Edit
                         </MenuItem>
                     )}
 
                     {onRemoveClick && (
-                        <MenuItem onClick={handleRemoveClick} sx={{ color: 'error.main' }}>
+                        <MenuItem
+                            onClick={handleRemoveClick}
+                            sx={{ color: 'error.main' }}
+                            disabled={actionPending}
+                        >
                             <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
                             Delete
                         </MenuItem>

@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import Typography from '@mui/material/Typography';
-import axios from 'axios';
 import Container from 'src/components/container';
 import Title, { TitleMenu } from 'src/components/title';
 import Table from 'src/components/table';
@@ -8,20 +7,15 @@ import Table from 'src/components/table';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { Category, fetchCategories, removeCategory } from 'src/store/features/categorySlice';
 import { fToNow } from 'src/utils/format-time';
+import categoryService from 'src/http/services/categoryService';
 
 export default function ViewCategories() {
     const categories = useAppSelector((state) => state.category.categories);
-    const accessToken = useAppSelector((state) => state.auth.accessToken);
     const dispatch = useAppDispatch();
 
-    const handleDeleteClick = (category: Category) => {
-        axios
-            .delete(`${import.meta.env.VITE_BASE_URL}/categories/${category._id}`, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            })
-            .then(() => {
-                dispatch(removeCategory(category._id));
-            });
+    const handleDeleteClick = async (category: Category) => {
+        await categoryService.deleteCategory(category._id);
+        dispatch(removeCategory(category._id));
     };
 
     useEffect(() => {

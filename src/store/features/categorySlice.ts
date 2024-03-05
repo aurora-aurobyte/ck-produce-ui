@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { RootState } from '../store';
+import categoryService from 'src/http/services/categoryService';
 
 export interface Category {
     _id: string;
@@ -22,16 +21,8 @@ const initialState: CategoryState = {
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchCategories = createAsyncThunk<Category[], void, { state: RootState }>(
-    'category/fetchCategories',
-    (_, { getState }) => {
-        const { accessToken } = getState().auth;
-        return axios
-            .get(`${import.meta.env.VITE_BASE_URL}/categories`, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            })
-            .then((response) => response.data);
-    }
+export const fetchCategories = createAsyncThunk<Category[]>('category/fetchCategories', () =>
+    categoryService.getCategories()
 );
 
 export const categorySlice = createSlice({

@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import axiosInstance from 'src/http/http-common';
 import { RootState } from '../store';
 
 export interface User {
@@ -30,7 +31,18 @@ export const verifyUser = createAsyncThunk<User, void, { state: RootState }>(
             .get(`${import.meta.env.VITE_BASE_URL}/auth/getMyInfo`, {
                 headers: { Authorization: `Bearer ${accessToken}` },
             })
-            .then((response) => response.data as User);
+            .then((response) => {
+                axiosInstance.interceptors.request.use(
+                    (config) => {
+                        if (accessToken) {
+                            config.headers.Authorization = `Bearer ${accessToken}`;
+                        }
+                        return config;
+                    },
+                    (error) => Promise.reject(error)
+                );
+                return response.data as User;
+            });
     }
 );
 
