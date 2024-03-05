@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import productService from 'src/http/services/productService';
 import { Category } from './categorySlice';
-import { RootState } from '../store';
 
 export interface Product {
     _id: string;
@@ -29,16 +28,8 @@ const initialState: ProductState = {
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchProducts = createAsyncThunk<Product[], void, { state: RootState }>(
-    'product/fetchProducts',
-    (_, { getState }) => {
-        const { accessToken } = getState().auth;
-        return axios
-            .get(`${import.meta.env.VITE_BASE_URL}/products`, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            })
-            .then((response) => response.data);
-    }
+export const fetchProducts = createAsyncThunk<Product[]>('product/fetchProducts', () =>
+    productService.getProducts()
 );
 
 export const productSlice = createSlice({
@@ -51,7 +42,18 @@ export const productSlice = createSlice({
             }
             localStorage.setItem('products', JSON.stringify(state.products));
         },
-        updateProduct: (state, action: PayloadAction<Product>) => {
+        updateProduct: (
+            state,
+            action: PayloadAction<{
+                _id: String;
+                name: string;
+                purchasePrice: number;
+                unitPrice: number;
+                tax: number;
+                categoryId: string;
+                description: string;
+            }>
+        ) => {
             const product = state.products.find(
                 (_product: Product) => _product._id === action.payload._id
             );
@@ -61,7 +63,7 @@ export const productSlice = createSlice({
                 product.unitPrice = action.payload.unitPrice;
                 product.tax = action.payload.tax;
                 product.categoryId = action.payload.categoryId;
-                product.category = action.payload.category;
+                // product.category = action.payload.category;
                 product.description = action.payload.description;
             }
             localStorage.setItem('products', JSON.stringify(state.products));

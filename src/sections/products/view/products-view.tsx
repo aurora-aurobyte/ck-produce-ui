@@ -9,12 +9,14 @@ import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { Product, fetchProducts, removeProduct } from 'src/store/features/productSlice';
 import { useEffect } from 'react';
 import { fToNow } from 'src/utils/format-time';
+import productService from 'src/http/services/productService';
 
 export default function ViewProducts() {
     const products = useAppSelector((state) => state.product.products);
     const dispatch = useAppDispatch();
 
-    const handleDeleteClick = (product: Product) => {
+    const handleDeleteClick = async (product: Product) => {
+        await productService.deleteProduct(product._id);
         dispatch(removeProduct(product._id));
     };
 

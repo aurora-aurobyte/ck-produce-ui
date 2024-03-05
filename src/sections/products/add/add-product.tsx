@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Container from 'src/components/container/container';
 import Title from 'src/components/title';
 
@@ -7,21 +6,21 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
-import { Product, addProduct, updateProduct } from 'src/store/features/productSlice';
+import { addProduct, updateProduct } from 'src/store/features/productSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
 import { FormControl, MenuItem } from '@mui/material';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { Category } from 'src/store/features/categorySlice';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+import productService from 'src/http/services/productService';
+import { useEffect } from 'react';
+import { fetchCategories } from 'src/store/features/categorySlice';
 
 interface IFormInput {
-    _id: string;
     name: string;
     purchasePrice: number;
     unitPrice: number;
     tax: number;
     categoryId: string;
-    category: Category;
     description: string;
 }
 
@@ -33,49 +32,57 @@ type AddProductProps = {
 };
 
 export default function AddProduct({ productId, edit }: AddProductProps) {
-    const products = useAppSelector((state) => state.product.products);
     const categories = useAppSelector((state) => state.category.categories);
     const {
         register,
         handleSubmit,
-        setValue,
-        getValues,
-        watch,
-        formState: { errors },
+        control,
+        formState: { errors, isLoading, isSubmitting },
     } = useForm<IFormInput>({
         mode: 'onChange',
+        defaultValues: async () => {
+            if (edit) {
+                const product = await productService.getProduct(productId as string);
+                return {
+                    name: product.name,
+                    purchasePrice: product.purchasePrice,
+                    unitPrice: product.unitPrice,
+                    tax: product.tax,
+                    categoryId: product.categoryId,
+                    description: product.description,
+                };
+            }
+            return {
+                name: '',
+                purchasePrice: 0,
+                unitPrice: 0,
+                tax: 0,
+                categoryId: '',
+                description: '',
+            };
+        },
     });
 
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const onSubmit: SubmitHandler<IFormInput> = (values) => {
+    const onSubmit: SubmitHandler<IFormInput> = async (values) => {
         if (edit) {
-            dispatch(
-                updateProduct({ ...values, createdAt: '', updatedAt: '', _id: productId as string })
-            );
+            await productService.updateProduct(productId as string, values);
+            dispatch(updateProduct({ ...values, _id: productId as string }));
         } else {
-            dispatch(addProduct({ ...values, createdAt: '', updatedAt: '' }));
+            const addedProduct = await productService.createProduct(values);
+            dispatch(addProduct(addedProduct));
         }
-        router.back();
+        router.push('/products');
     };
 
     useEffect(() => {
-        if (!edit) return;
+        dispatch(fetchCategories());
+    }, [dispatch]);
 
-        const val = products.find((product) => product._id === productId || '') as Product;
+    if (isLoading) return 'Loading...';
 
-        setValue('name', val.name);
-        setValue('_id', val._id);
-        setValue('purchasePrice', val.purchasePrice);
-        setValue('unitPrice', val.unitPrice);
-        // setValue('categoryName', val.categoryName);
-        setValue('categoryId', val.categoryId);
-        setValue('description', val.description);
-        setValue('tax', val.tax);
-    }, [productId, products, edit, setValue, categories]);
-
-    if (!watch('categoryId') && edit) return 'Loading...';
     return (
         <Container>
             <Title title={edit ? 'Edit Product' : 'Add Product'} />
@@ -154,34 +161,33 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <FormControl fullWidth>
-                            <TextField
-                                id="label-categoryId-select"
-                                select
-                                label="Category"
-                                variant="standard"
-                                fullWidth
-                                {...register('categoryId', {
-                                    onChange: (e) => {
-                                        const categoryId = e.target.value;
-                                        setValue('categoryId', categoryId);
-                                        // setValue(
-                                        //     'categoryName',
-                                        //     categories.find((c) => c._id === categoryId)?.name || ''
-                                        // );
-                                        return categoryId;
-                                    },
-                                    required: 'This is required',
-                                })}
-                                error={!!errors.categoryId}
-                                helperText={errors.categoryId?.message}
-                                defaultValue={getValues('categoryId')}
-                            >
-                                {categories.map((item) => (
-                                    <MenuItem key={item.name + item._id} value={item._id}>
-                                        {item.name}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                            <Controller
+                                name="categoryId"
+                                control={control}
+                                defaultValue=""
+                                render={({ field: { onChange, onBlur, value, ref } }) => (
+                                    <TextField
+                                        ref={ref}
+                                        id="label-categoryId-select"
+                                        select
+                                        label="Category"
+                                        variant="standard"
+                                        fullWidth
+                                        value={value}
+                                        onChange={onChange}
+                                        onBlur={onBlur}
+                                        error={!!errors.categoryId}
+                                        helperText={errors.categoryId?.message}
+                                        defaultValue=""
+                                    >
+                                        {categories.map((item) => (
+                                            <MenuItem key={item._id} value={item._id}>
+                                                {item.name}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                )}
+                            />
                         </FormControl>
                     </Grid>
 
@@ -203,7 +209,13 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <Button variant="contained" color="inherit" type="submit">
+                        <Button
+                            variant="contained"
+                            color="inherit"
+                            type="submit"
+                            key={`${isSubmitting}`}
+                            disabled={isSubmitting}
+                        >
                             Save
                         </Button>
                     </Grid>
