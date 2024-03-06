@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import orderService from 'src/http/services/orderService';
 import { RootState } from '../store';
 import { Customer } from './customerSlice';
 import { Product } from './productSlice';
@@ -36,14 +36,7 @@ const initialState: OrderState = {
 // Generates pending, fulfilled and rejected action types
 export const fetchOrders = createAsyncThunk<Order[], void, { state: RootState }>(
     'order/fetchOrders',
-    (_, { getState }) => {
-        const { accessToken } = getState().auth;
-        return axios
-            .get(`${import.meta.env.VITE_BASE_URL}/orders`, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            })
-            .then((response) => response.data);
-    }
+    () => orderService.getOrders()
 );
 
 export const orderSlice = createSlice({
@@ -56,13 +49,21 @@ export const orderSlice = createSlice({
             }
             localStorage.setItem('orders', JSON.stringify(state.orders));
         },
-        updateOrder: (state, action: PayloadAction<Order>) => {
+        updateOrder: (
+            state,
+            action: PayloadAction<{
+                _id: String;
+                date: string;
+                customerId: string;
+                customer?: Customer;
+            }>
+        ) => {
             const order = state.orders.find((_order: Order) => _order._id === action.payload._id);
             if (order) {
                 order.date = action.payload.date;
                 order.customerId = action.payload.customerId;
                 order.customer = action.payload.customer;
-                order.orderItems = action.payload.orderItems;
+                // order.orderItems = action.payload.orderItems;
             }
             localStorage.setItem('orders', JSON.stringify(state.orders));
         },

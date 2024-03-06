@@ -9,13 +9,15 @@ import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { Order, fetchOrders, removeOrder } from 'src/store/features/orderSlice';
 import { useEffect } from 'react';
 import { fDate, fToNow } from 'src/utils/format-time';
+import orderService from 'src/http/services/orderService';
 
 export default function ViewOrders() {
     const orders = useAppSelector((state) => state.order.orders);
     const dispatch = useAppDispatch();
 
-    const handleDeleteClick = (product: Order) => {
-        dispatch(removeOrder(product._id));
+    const handleDeleteClick = async (order: Order) => {
+        await orderService.deleteOrder(order._id);
+        dispatch(removeOrder(order._id));
     };
 
     useEffect(() => {

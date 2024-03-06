@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import customerService from 'src/http/services/customerService';
 
 export interface Customer {
-    customerId: string;
+    _id: string;
     name: string;
     email: string;
     phone: string;
@@ -9,6 +10,8 @@ export interface Customer {
     businessName: string;
     address: string;
     balance: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface CustomerState {
@@ -24,14 +27,8 @@ const initialState: CustomerState = {
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchCustomers = createAsyncThunk<Customer[]>(
-    'customer/fetchCustomers',
-    () =>
-        new Promise((resolve, _) => {
-            setTimeout(() => {
-                resolve(JSON.parse(localStorage.getItem('customers') || '[]'));
-            }, 200);
-        })
+export const fetchCustomers = createAsyncThunk<Customer[]>('customer/fetchCustomers', () =>
+    customerService.getCustomers()
 );
 
 export const customerSlice = createSlice({
@@ -46,10 +43,10 @@ export const customerSlice = createSlice({
         },
         updateCustomer: (
             state,
-            action: PayloadAction<{ customerId: string; name: string; address: string }>
+            action: PayloadAction<{ _id: string; name: string; address: string }>
         ) => {
             const customer = state.customers.find(
-                (_customer: Customer) => _customer.customerId === action.payload.customerId
+                (_customer: Customer) => _customer._id === action.payload._id
             );
             if (customer) {
                 customer.name = action.payload.name;
@@ -59,7 +56,7 @@ export const customerSlice = createSlice({
         },
         removeCustomer: (state, action: PayloadAction<string>) => {
             const index = state.customers.findIndex(
-                (customer: Customer) => customer.customerId === action.payload
+                (customer: Customer) => customer._id === action.payload
             );
             if (index > -1) {
                 state.customers.splice(index, 1);
