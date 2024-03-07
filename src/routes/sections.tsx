@@ -13,9 +13,10 @@ export const CustomersViewPage = lazy(() => import('src/pages/customers'));
 export const CustomersAddPage = lazy(() => import('src/pages/customers-add'));
 export const CustomersEditPage = lazy(() => import('src/pages/customers-edit'));
 
-export const ProductsPage = lazy(() => import('src/pages/products'));
-export const ProductsAddPage = lazy(() => import('src/pages/products-add'));
-export const ProductsEditPage = lazy(() => import('src/pages/products-edit'));
+export const ListProductsPage = lazy(() => import('src/pages/products/list-products-page'));
+export const ViewProductPage = lazy(() => import('src/pages/products/view-product-page'));
+export const AddProductPage = lazy(() => import('src/pages/products/add-product-page'));
+export const EditProductPage = lazy(() => import('src/pages/products/edit-product-page'));
 
 export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const OrdersAddPage = lazy(() => import('src/pages/orders-add'));
@@ -85,9 +86,10 @@ export default function Router() {
                 {
                     path: 'products',
                     children: [
-                        { element: <ProductsPage />, index: true },
-                        { path: 'add', element: <ProductsAddPage /> },
-                        { path: 'edit/:productId', element: <ProductsEditPage /> },
+                        { element: <ListProductsPage />, index: true },
+                        { path: 'view/:productId', element: <ViewProductPage /> },
+                        { path: 'add', element: <AddProductPage /> },
+                        { path: 'edit/:productId', element: <EditProductPage /> },
                     ],
                 },
                 {

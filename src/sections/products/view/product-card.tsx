@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -9,19 +8,23 @@ import Typography from '@mui/material/Typography';
 import { fCurrency } from 'src/utils/format-number';
 
 import Label from 'src/components/label';
-import { ColorPreview } from 'src/components/color-utils';
+import { Product } from 'src/store/features/productSlice';
+import Loader from 'src/components/loader/loader';
+import { fToNow } from 'src/utils/format-time';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-    product: any;
+    product: Product;
+    loading: boolean;
 };
 
-export default function ShopProductCard({ product }: Props) {
+export default function ShopProductCard({ product, loading }: Props) {
+    if (loading) return <Loader />;
     const renderStatus = (
         <Label
             variant="filled"
-            color={(product.status === 'sale' && 'error') || 'info'}
+            color={(product.tax > 0 && 'error') || 'info'}
             sx={{
                 zIndex: 9,
                 top: 16,
@@ -30,59 +33,52 @@ export default function ShopProductCard({ product }: Props) {
                 textTransform: 'uppercase',
             }}
         >
-            {product.status}
+            {product.tax} %
         </Label>
-    );
-
-    const renderImg = (
-        <Box
-            component="img"
-            alt={product.name}
-            src={product.cover}
-            sx={{
-                top: 0,
-                width: 1,
-                height: 1,
-                objectFit: 'cover',
-                position: 'absolute',
-            }}
-        />
     );
 
     const renderPrice = (
         <Typography variant="subtitle1">
-            <Typography
-                component="span"
-                variant="body1"
-                sx={{
-                    color: 'text.disabled',
-                    textDecoration: 'line-through',
-                }}
-            >
-                {product.priceSale && fCurrency(product.priceSale)}
+            <Typography component="span" variant="body1">
+                Unit Price
             </Typography>
             &nbsp;
-            {fCurrency(product.price)}
+            {fCurrency(product.unitPrice)}
         </Typography>
     );
 
     return (
         <Card>
-            <Box sx={{ pt: '100%', position: 'relative' }}>
-                {product.status && renderStatus}
+            <Box sx={{ pt: '50%', position: 'relative' }}>
+                {product.tax && renderStatus}
 
-                {renderImg}
+                <Box
+                    component="img"
+                    alt={product.name}
+                    src="/assets/images/view-item/product.jpg"
+                    sx={{
+                        top: 0,
+                        width: 1,
+                        height: 1,
+                        objectFit: 'cover',
+                        position: 'absolute',
+                    }}
+                />
             </Box>
 
             <Stack spacing={2} sx={{ p: 3 }}>
-                <Link color="inherit" underline="hover" variant="subtitle2" noWrap>
+                <Typography variant="h4" gutterBottom>
                     {product.name}
-                </Link>
+                </Typography>
 
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <ColorPreview colors={product.colors} />
                     {renderPrice}
                 </Stack>
+
+                <Typography color="caption">Created {fToNow(product.createdAt)}</Typography>
+                <Typography color="caption" mt={(theme) => `${theme.spacing(0)} !important`}>
+                    Updated {fToNow(product.updatedAt)}
+                </Typography>
             </Stack>
         </Card>
     );

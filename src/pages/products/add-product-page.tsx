@@ -1,19 +1,17 @@
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
 
 import { AddProduct } from 'src/sections/products';
 
 // ----------------------------------------------------------------------
 
-export default function ProductsEditPage() {
-    const { productId } = useParams();
+export default function AddProductPage() {
     return (
         <>
             <Helmet>
-                <title> edit Product | Minimal UI </title>
+                <title> Add Product | Minimal UI </title>
             </Helmet>
 
-            <AddProduct edit productId={productId} />
+            <AddProduct />
         </>
     );
 }

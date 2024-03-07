@@ -40,7 +40,9 @@ export default function ViewItemCard({ category, loading }: Props) {
                     {category.name}
                 </Typography>
                 <Typography color="caption">Created {fToNow(category.createdAt)}</Typography>
-                <Typography color="caption">Updated {fToNow(category.updatedAt)}</Typography>
+                <Typography color="caption" mt={(theme) => `${theme.spacing(0)} !important`}>
+                    Updated {fToNow(category.updatedAt)}
+                </Typography>
             </Stack>
         </Card>
     );
