@@ -11,6 +11,7 @@ import { useAppDispatch } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import categoryService from 'src/http/services/categoryService';
+import Loader from 'src/components/loader/loader';
 
 interface IFormInput {
     name: string;
@@ -59,43 +60,45 @@ export default function AddCategory({ categoryId, edit }: Readonly<AddCategoryPr
         router.push('/categories');
     };
 
-    if (isLoading) return 'Loading...';
+    const renderForm = (
+        <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+            <Grid container spacing={2}>
+                <Grid item xs={12} md={12}>
+                    <TextField
+                        id="name"
+                        {...register('name', {
+                            required: 'This is required',
+                            maxLength: {
+                                value: 100,
+                                message: 'Category name exceed maximum length.',
+                            },
+                        })}
+                        label="Category Name"
+                        variant="standard"
+                        fullWidth
+                        error={!!errors.name}
+                        helperText={errors.name?.message}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Button
+                        key={`${isSubmitting}`}
+                        variant="contained"
+                        color="inherit"
+                        type="submit"
+                        disabled={isSubmitting}
+                    >
+                        Save
+                    </Button>
+                </Grid>
+            </Grid>
+        </Box>
+    );
 
     return (
         <Container>
             <Title title={edit ? 'Edit Category' : 'Add Category'} />
-            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={12}>
-                        <TextField
-                            id="name"
-                            {...register('name', {
-                                required: 'This is required',
-                                maxLength: {
-                                    value: 100,
-                                    message: 'Category name exceed maximum length.',
-                                },
-                            })}
-                            label="Category Name"
-                            variant="standard"
-                            fullWidth
-                            error={!!errors.name}
-                            helperText={errors.name?.message}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button
-                            key={`${isSubmitting}`}
-                            variant="contained"
-                            color="inherit"
-                            type="submit"
-                            disabled={isSubmitting}
-                        >
-                            Save
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Box>
+            {isLoading ? <Loader /> : renderForm}
         </Container>
     );
 }

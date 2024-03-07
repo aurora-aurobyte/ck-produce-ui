@@ -36,9 +36,10 @@ export const PendingPaymentsPage = lazy(() => import('src/pages/pendingPayments'
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
-export const CategoryPage = lazy(() => import('src/pages/categories'));
-export const CategoriesAddPage = lazy(() => import('src/pages/categories-add'));
-export const CategoriesEditPage = lazy(() => import('src/pages/categories-edit'));
+export const ListCategoriesPage = lazy(() => import('src/pages/categories/list-categories-page'));
+export const ViewCategoryPage = lazy(() => import('src/pages/categories/view-category-page'));
+export const AddCategoryPage = lazy(() => import('src/pages/categories/add-category-page'));
+export const EditCategoryPage = lazy(() => import('src/pages/categories/edit-category-page'));
 
 // ----------------------------------------------------------------------
 
@@ -125,9 +126,10 @@ export default function Router() {
                 {
                     path: 'categories',
                     children: [
-                        { element: <CategoryPage />, index: true },
-                        { path: 'add', element: <CategoriesAddPage /> },
-                        { path: 'edit/:categoryId', element: <CategoriesEditPage /> },
+                        { element: <ListCategoriesPage />, index: true },
+                        { path: 'view/:categoryId', element: <ViewCategoryPage /> },
+                        { path: 'add', element: <AddCategoryPage /> },
+                        { path: 'edit/:categoryId', element: <EditCategoryPage /> },
                     ],
                 },
             ],
