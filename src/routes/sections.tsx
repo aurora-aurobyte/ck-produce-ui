@@ -9,9 +9,9 @@ export const IndexPage = lazy(() => import('src/pages/app'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 
-export const CustomersViewPage = lazy(() => import('src/pages/customers'));
-export const CustomersAddPage = lazy(() => import('src/pages/customers-add'));
-export const CustomersEditPage = lazy(() => import('src/pages/customers-edit'));
+export const ListCustomersPage = lazy(() => import('src/pages/customers/list-customers-page'));
+export const AddCustomerPage = lazy(() => import('src/pages/customers/add-customer-page'));
+export const EditCustomerPage = lazy(() => import('src/pages/customers/edit-customer-page'));
 
 export const ListProductsPage = lazy(() => import('src/pages/products/list-products-page'));
 export const ViewProductPage = lazy(() => import('src/pages/products/view-product-page'));
@@ -78,9 +78,9 @@ export default function Router() {
                 {
                     path: 'customers',
                     children: [
-                        { element: <CustomersViewPage />, index: true },
-                        { path: 'add', element: <CustomersAddPage /> },
-                        { path: 'edit/:customerId', element: <CustomersEditPage /> },
+                        { element: <ListCustomersPage />, index: true },
+                        { path: 'add', element: <AddCustomerPage /> },
+                        { path: 'edit/:customerId', element: <EditCustomerPage /> },
                     ],
                 },
                 { path: 'user', element: <UserPage /> },

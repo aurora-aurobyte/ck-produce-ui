@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import customerService from 'src/http/services/customerService';
 import { fToNow } from 'src/utils/format-time';
 
-export default function ViewCustomers() {
+export default function ListCustomers() {
     const customers = useAppSelector((state) => state.customer.customers);
     const dispatch = useAppDispatch();
 

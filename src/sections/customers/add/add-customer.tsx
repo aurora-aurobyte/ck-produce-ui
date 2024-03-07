@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Container from 'src/components/container/container';
 import Title from 'src/components/title';
 
@@ -7,14 +6,15 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
-import { Customer, addCustomer, updateCustomer } from 'src/store/features/customerSlice';
-import { useAppDispatch, useAppSelector } from 'src/store/hooks';
+import { addCustomer, updateCustomer } from 'src/store/features/customerSlice';
+import { useAppDispatch } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import customerService from 'src/http/services/customerService';
 
+// ----------------------------------------------------------------
+
 interface IFormInput {
-    // customerId: string;
     name: string;
     email: string;
     phone: string;
@@ -23,7 +23,6 @@ interface IFormInput {
     address: string;
     balance: number;
 }
-// ----------------------------------------------------------------
 
 type AddCustomerProps = {
     customerId?: string;
@@ -34,7 +33,6 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
     const {
         register,
         handleSubmit,
-        setValue,
         formState: { errors },
     } = useForm<IFormInput>({
         mode: 'onChange',
@@ -63,7 +61,6 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
         },
     });
 
-    const customers = useAppSelector((state) => state.customer.customers);
     const dispatch = useAppDispatch();
     const router = useRouter();
 
@@ -76,23 +73,8 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
             const _data = await customerService.createCustomer(values);
             dispatch(addCustomer(_data));
         }
-        router.back();
+        router.push('/customers');
     };
-
-    useEffect(() => {
-        if (!edit) return;
-        const val = customers.find(
-            (customer) => customer._id === customerId || ''
-        ) as Customer;
-
-        setValue('name', val.name);
-        setValue('address', val.address);
-        setValue('email', val.email);
-        setValue('phone', val.phone);
-        setValue('postalCode', val.postalCode);
-        setValue('businessName', val.businessName);
-        setValue('balance', val.balance);
-    }, [customerId, customers, edit, setValue]);
 
     return (
         <Container>
