@@ -67,14 +67,12 @@ export const orderSlice = createSlice({
                 order.customer = action.payload.customer;
                 if (action.payload.orderItems) order.orderItems = action.payload.orderItems;
             }
-            localStorage.setItem('orders', JSON.stringify(state.orders));
         },
         removeOrder: (state, action: PayloadAction<string>) => {
             const index = state.orders.findIndex((order: Order) => order._id === action.payload);
             if (index > -1) {
                 state.orders.splice(index, 1);
             }
-            localStorage.setItem('orders', JSON.stringify(state.orders));
         },
     },
     extraReducers: (builder) => {
