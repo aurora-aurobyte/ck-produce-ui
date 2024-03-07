@@ -10,11 +10,11 @@ import Button from '@mui/material/Button';
 import { Customer, addCustomer, updateCustomer } from 'src/store/features/customerSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
-import { v4 as uuidv4 } from 'uuid';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import customerService from 'src/http/services/customerService';
 
 interface IFormInput {
-    customerId: string;
+    // customerId: string;
     name: string;
     email: string;
     phone: string;
@@ -36,17 +36,45 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
         handleSubmit,
         setValue,
         formState: { errors },
-    } = useForm<IFormInput>({ mode: 'onChange' });
+    } = useForm<IFormInput>({
+        mode: 'onChange',
+        defaultValues: async () => {
+            if (edit && customerId) {
+                const customer = await customerService.getCustomer(customerId);
+                return {
+                    name: customer.name,
+                    email: customer.email,
+                    address: customer.address,
+                    balance: customer.balance,
+                    businessName: customer.businessName,
+                    phone: customer.phone,
+                    postalCode: customer.postalCode,
+                };
+            }
+            return {
+                name: '',
+                email: '',
+                address: '',
+                balance: 0,
+                businessName: '',
+                phone: '',
+                postalCode: 0,
+            };
+        },
+    });
 
     const customers = useAppSelector((state) => state.customer.customers);
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const onSubmit: SubmitHandler<IFormInput> = (values) => {
+    const onSubmit: SubmitHandler<IFormInput> = async (values) => {
+        if (!customerId) return;
         if (edit) {
-            dispatch(updateCustomer({ ...values, customerId: customerId as string }));
+            await customerService.updateCustomer(customerId, values);
+            dispatch(updateCustomer({ ...values, _id: customerId as string }));
         } else {
-            dispatch(addCustomer({ ...values, customerId: uuidv4() }));
+            const _data = await customerService.createCustomer(values);
+            dispatch(addCustomer(_data));
         }
         router.back();
     };
@@ -54,11 +82,10 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
     useEffect(() => {
         if (!edit) return;
         const val = customers.find(
-            (customer) => customer.customerId === customerId || ''
+            (customer) => customer._id === customerId || ''
         ) as Customer;
 
         setValue('name', val.name);
-        setValue('customerId', val.customerId);
         setValue('address', val.address);
         setValue('email', val.email);
         setValue('phone', val.phone);
