@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -13,7 +13,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
-import { OrderItem } from 'src/store/features/orderSlice';
+import { Order, OrderItem, updateOrder } from 'src/store/features/orderSlice';
+import { useAppDispatch } from 'src/store/hooks';
+import { useRouter } from 'src/routes/hooks';
+import { addInvoice } from 'src/store/features/invoiceSlice';
+import invoiceService from 'src/http/services/invoiceService';
 
 const Transition = React.forwardRef(
     (
@@ -61,21 +65,19 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 type CreateInvoiceProps = {
     open: boolean;
     handleClose: () => void;
-    orderItems: OrderItem[];
-    handleCreateClick: (selected: number[]) => void;
+    order: Order;
 };
 
-export default function CreateInvoice({
-    open,
-    handleClose,
-    orderItems,
-    handleCreateClick,
-}: CreateInvoiceProps) {
+export default function CreateInvoice({ open, handleClose, order }: CreateInvoiceProps) {
     const [selected, setSelected] = useState<readonly number[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const dispatch = useAppDispatch();
+    const router = useRouter();
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = orderItems.map((_, id) => id);
+            const newSelected = order.orderItems.map((_, id) => id);
             setSelected(newSelected);
             return;
         }
@@ -101,6 +103,35 @@ export default function CreateInvoice({
         setSelected(newSelected);
     };
 
+    const handleCreateClick = async () => {
+        setLoading(true);
+        // handleClose();
+        const createdInvoice = await invoiceService.createOrderInvoice({
+            orderId: order._id,
+            orderItemIds: order.orderItems.map((orderItem) => orderItem._id),
+        });
+        dispatch(addInvoice(createdInvoice));
+
+        const items: OrderItem[] = order.orderItems.map((orderItem: OrderItem, index) => ({
+            ...orderItem,
+            delivered: selected.includes(index),
+        }));
+
+        dispatch(
+            updateOrder({
+                ...order,
+                orderItems: items,
+            })
+        );
+
+        router.push(`/invoices/edit/${createdInvoice._id}`);
+    };
+
+    useEffect(() => {
+        const newSelected = order.orderItems.map((_, id) => id);
+        setSelected(newSelected);
+    }, [order]);
+
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
     return (
@@ -118,10 +149,10 @@ export default function CreateInvoice({
                         <EnhancedTableHead
                             numSelected={selected.length}
                             onSelectAllClick={handleSelectAllClick}
-                            rowCount={orderItems.length}
+                            rowCount={order.orderItems.length}
                         />
                         <TableBody>
-                            {orderItems.map((row, index) => {
+                            {order.orderItems.map((row, index) => {
                                 const isItemSelected = isSelected(index);
                                 const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -163,7 +194,9 @@ export default function CreateInvoice({
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={() => handleCreateClick(selected as number[])}>Create</Button>
+                <Button onClick={() => handleCreateClick()} disabled={loading} key={`${loading}`}>
+                    Create
+                </Button>
             </DialogActions>
         </Dialog>
     );

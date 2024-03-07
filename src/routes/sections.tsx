@@ -18,9 +18,10 @@ export const ViewProductPage = lazy(() => import('src/pages/products/view-produc
 export const AddProductPage = lazy(() => import('src/pages/products/add-product-page'));
 export const EditProductPage = lazy(() => import('src/pages/products/edit-product-page'));
 
-export const OrdersPage = lazy(() => import('src/pages/orders'));
-export const OrdersAddPage = lazy(() => import('src/pages/orders-add'));
-export const OrdersEditPage = lazy(() => import('src/pages/orders-edit'));
+export const ListOrdersPage = lazy(() => import('src/pages/orders/list-orders-page'));
+export const ViewOrderPage = lazy(() => import('src/pages/orders/view-order-page'));
+export const AddOrderPage = lazy(() => import('src/pages/orders/add-order-page'));
+export const EditOrderPage = lazy(() => import('src/pages/orders/edit-order-page'));
 
 export const InvoicesPage = lazy(() => import('src/pages/invoices'));
 export const InvoicesAddPage = lazy(() => import('src/pages/invoices-add'));
@@ -95,9 +96,10 @@ export default function Router() {
                 {
                     path: 'orders',
                     children: [
-                        { element: <OrdersPage />, index: true },
-                        { path: 'add', element: <OrdersAddPage /> },
-                        { path: 'edit/:orderId', element: <OrdersEditPage /> },
+                        { element: <ListOrdersPage />, index: true },
+                        { path: 'view/:orderId', element: <ViewOrderPage /> },
+                        { path: 'add', element: <AddOrderPage /> },
+                        { path: 'edit/:orderId', element: <EditOrderPage /> },
                     ],
                 },
                 {

@@ -1,2 +1,3 @@
 export { default as AddOrder } from './add/add-order';
-export { default as OrdersView } from './view/order-view';
+export { default as ViewOrder } from './view/view-order';
+export { default as ListOrders } from './list/list-orders';

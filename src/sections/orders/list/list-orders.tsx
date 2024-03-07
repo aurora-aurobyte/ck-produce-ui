@@ -11,8 +11,8 @@ import { useEffect } from 'react';
 import { fDate, fToNow } from 'src/utils/format-time';
 import orderService from 'src/http/services/orderService';
 
-export default function ViewOrders() {
-    const orders = useAppSelector((state) => state.order.orders);
+export default function ListOrders() {
+    const { loading, orders } = useAppSelector((state) => state.order);
     const dispatch = useAppDispatch();
 
     const handleDeleteClick = async (order: Order) => {
@@ -31,10 +31,12 @@ export default function ViewOrders() {
             </Title>
             <Table<Order>
                 data={orders}
+                loading={loading}
                 columns={[
                     { id: 'customerName', label: 'Customer' },
                     { id: 'date', label: 'Date', render: (row: Order) => fDate(row.date) },
                 ]}
+                viewPage={(row: Order) => `/orders/view/${row._id}`}
                 editPage={(row: Order) => `/orders/edit/${row._id}`}
                 onRemoveClick={handleDeleteClick}
                 renderRow={(row) => (

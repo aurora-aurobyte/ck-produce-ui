@@ -5,6 +5,7 @@ import { Customer } from './customerSlice';
 import { Product } from './productSlice';
 
 export interface OrderItem {
+    _id: string;
     productId: string;
     product?: Product;
     quantity: number;
@@ -56,6 +57,7 @@ export const orderSlice = createSlice({
                 date: string;
                 customerId: string;
                 customer?: Customer;
+                orderItems?: OrderItem[];
             }>
         ) => {
             const order = state.orders.find((_order: Order) => _order._id === action.payload._id);
@@ -63,7 +65,7 @@ export const orderSlice = createSlice({
                 order.date = action.payload.date;
                 order.customerId = action.payload.customerId;
                 order.customer = action.payload.customer;
-                // order.orderItems = action.payload.orderItems;
+                if (action.payload.orderItems) order.orderItems = action.payload.orderItems;
             }
             localStorage.setItem('orders', JSON.stringify(state.orders));
         },

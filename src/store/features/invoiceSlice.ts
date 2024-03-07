@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 export interface InvoiceItem {
+    _id: string;
     productId: string;
     productName: string;
     purchasePrice: number;
@@ -11,6 +12,7 @@ export interface InvoiceItem {
 }
 
 export interface Invoice {
+    _id: string;
     orderId: string;
     invoiceId: string;
     date: string;
