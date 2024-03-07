@@ -9,8 +9,8 @@ import { Category, fetchCategories, removeCategory } from 'src/store/features/ca
 import { fToNow } from 'src/utils/format-time';
 import categoryService from 'src/http/services/categoryService';
 
-export default function ViewCategories() {
-    const categories = useAppSelector((state) => state.category.categories);
+export default function ListCategories() {
+    const { loading, categories } = useAppSelector((state) => state.category);
     const dispatch = useAppDispatch();
 
     const handleDeleteClick = async (category: Category) => {
@@ -29,7 +29,9 @@ export default function ViewCategories() {
             </Title>
             <Table<Category>
                 data={categories}
+                loading={loading}
                 columns={[{ id: 'name', label: 'Name' }]}
+                viewPage={(row: Category) => `/categories/view/${row._id}`}
                 editPage={(row: Category) => `/categories/edit/${row._id}`}
                 onRemoveClick={handleDeleteClick}
                 renderRow={(row) => (

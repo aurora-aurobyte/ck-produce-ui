@@ -17,24 +17,29 @@ import TableToolbar from './table-toolbar';
 import { emptyRows, applyFilter, getComparator } from './utils';
 import { TableColumn } from './tableColumn';
 import RenderRow from './render-row';
+import Loader from '../loader/loader';
 
 // ----------------------------------------------------------------------
 
 interface TableProps<T> {
     data: T[];
     columns: TableColumn<T>[];
+    viewPage?: (row: T) => string;
     editPage?: (row: T) => string;
     onRemoveClick?: (row: T) => any;
     renderRow?: (row: T) => ReactNode;
+    loading?: boolean;
     // renderRow?: (row: T, selected: boolean, handleClick: (event: ChangeEvent) => void) => ReactNode;
 }
 
 export default function Table<T>({
     data,
     columns,
+    viewPage,
     editPage,
     onRemoveClick,
     renderRow,
+    loading,
 }: TableProps<T>) {
     const [page, setPage] = useState(0);
 
@@ -105,6 +110,8 @@ export default function Table<T>({
 
     const notFound = !dataFiltered.length && !!filterName;
 
+    if (loading) return <Loader />;
+
     if (renderRow)
         return (
             <Scrollbar>
@@ -114,6 +121,7 @@ export default function Table<T>({
                             key={index}
                             // @ts-ignore
                             row={row}
+                            viewPage={viewPage}
                             editPage={editPage}
                             onRemoveClick={onRemoveClick}
                             renderRow={renderRow}

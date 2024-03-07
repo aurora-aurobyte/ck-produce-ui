@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { AddOrder } from 'src/sections/orders';
+import { ListCategories } from 'src/sections/category';
 
 // ----------------------------------------------------------------------
 
-export default function OrderAddPage() {
+export default function ListCategoriesPage() {
     return (
         <>
             <Helmet>
-                <title> Add Order | Minimal UI </title>
+                <title> Categories | Minimal UI </title>
             </Helmet>
 
-            <AddOrder />
+            <ListCategories />
         </>
     );
 }

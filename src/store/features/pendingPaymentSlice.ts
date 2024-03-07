@@ -4,7 +4,7 @@ import { Invoice } from './invoiceSlice';
 
 export interface PendingPayment {
     customerId: string;
-    customerName: string;
+    customer?: Customer;
     previousBalance: number;
     invoiceBalance: number;
 }
@@ -32,11 +32,11 @@ export const fetchPendingPayments = createAsyncThunk<PendingPayment[]>(
                 ) as Customer[];
                 const invoices = JSON.parse(localStorage.getItem('invoices') || '[]') as Invoice[];
                 const pendingPayments: PendingPayment[] = customers.map((customer: Customer) => ({
-                    customerId: customer.customerId,
+                    customerId: customer._id,
                     customerName: customer.name,
                     previousBalance: customer.balance || 0,
                     invoiceBalance: invoices.reduce((total: number, invoice: Invoice) => {
-                        if (invoice.customerId === customer.customerId) {
+                        if (invoice.customerId === customer._id) {
                             total += invoice.total;
                         }
                         return total;

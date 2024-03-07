@@ -13,13 +13,15 @@ export const CustomersViewPage = lazy(() => import('src/pages/customers'));
 export const CustomersAddPage = lazy(() => import('src/pages/customers-add'));
 export const CustomersEditPage = lazy(() => import('src/pages/customers-edit'));
 
-export const ProductsPage = lazy(() => import('src/pages/products'));
-export const ProductsAddPage = lazy(() => import('src/pages/products-add'));
-export const ProductsEditPage = lazy(() => import('src/pages/products-edit'));
+export const ListProductsPage = lazy(() => import('src/pages/products/list-products-page'));
+export const ViewProductPage = lazy(() => import('src/pages/products/view-product-page'));
+export const AddProductPage = lazy(() => import('src/pages/products/add-product-page'));
+export const EditProductPage = lazy(() => import('src/pages/products/edit-product-page'));
 
-export const OrdersPage = lazy(() => import('src/pages/orders'));
-export const OrdersAddPage = lazy(() => import('src/pages/orders-add'));
-export const OrdersEditPage = lazy(() => import('src/pages/orders-edit'));
+export const ListOrdersPage = lazy(() => import('src/pages/orders/list-orders-page'));
+export const ViewOrderPage = lazy(() => import('src/pages/orders/view-order-page'));
+export const AddOrderPage = lazy(() => import('src/pages/orders/add-order-page'));
+export const EditOrderPage = lazy(() => import('src/pages/orders/edit-order-page'));
 
 export const InvoicesPage = lazy(() => import('src/pages/invoices'));
 export const InvoicesAddPage = lazy(() => import('src/pages/invoices-add'));
@@ -36,9 +38,10 @@ export const PendingPaymentsPage = lazy(() => import('src/pages/pendingPayments'
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
-export const CategoryPage = lazy(() => import('src/pages/categories'));
-export const CategoriesAddPage = lazy(() => import('src/pages/categories-add'));
-export const CategoriesEditPage = lazy(() => import('src/pages/categories-edit'));
+export const ListCategoriesPage = lazy(() => import('src/pages/categories/list-categories-page'));
+export const ViewCategoryPage = lazy(() => import('src/pages/categories/view-category-page'));
+export const AddCategoryPage = lazy(() => import('src/pages/categories/add-category-page'));
+export const EditCategoryPage = lazy(() => import('src/pages/categories/edit-category-page'));
 
 // ----------------------------------------------------------------------
 
@@ -84,17 +87,19 @@ export default function Router() {
                 {
                     path: 'products',
                     children: [
-                        { element: <ProductsPage />, index: true },
-                        { path: 'add', element: <ProductsAddPage /> },
-                        { path: 'edit/:productId', element: <ProductsEditPage /> },
+                        { element: <ListProductsPage />, index: true },
+                        { path: 'view/:productId', element: <ViewProductPage /> },
+                        { path: 'add', element: <AddProductPage /> },
+                        { path: 'edit/:productId', element: <EditProductPage /> },
                     ],
                 },
                 {
                     path: 'orders',
                     children: [
-                        { element: <OrdersPage />, index: true },
-                        { path: 'add', element: <OrdersAddPage /> },
-                        { path: 'edit/:orderId', element: <OrdersEditPage /> },
+                        { element: <ListOrdersPage />, index: true },
+                        { path: 'view/:orderId', element: <ViewOrderPage /> },
+                        { path: 'add', element: <AddOrderPage /> },
+                        { path: 'edit/:orderId', element: <EditOrderPage /> },
                     ],
                 },
                 {
@@ -125,9 +130,10 @@ export default function Router() {
                 {
                     path: 'categories',
                     children: [
-                        { element: <CategoryPage />, index: true },
-                        { path: 'add', element: <CategoriesAddPage /> },
-                        { path: 'edit/:categoryId', element: <CategoriesEditPage /> },
+                        { element: <ListCategoriesPage />, index: true },
+                        { path: 'view/:categoryId', element: <ViewCategoryPage /> },
+                        { path: 'add', element: <AddCategoryPage /> },
+                        { path: 'edit/:categoryId', element: <EditCategoryPage /> },
                     ],
                 },
             ],

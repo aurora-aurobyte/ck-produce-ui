@@ -40,7 +40,6 @@ export const productSlice = createSlice({
             if (action.payload) {
                 state.products.push(action.payload);
             }
-            localStorage.setItem('products', JSON.stringify(state.products));
         },
         updateProduct: (
             state,
@@ -66,7 +65,6 @@ export const productSlice = createSlice({
                 // product.category = action.payload.category;
                 product.description = action.payload.description;
             }
-            localStorage.setItem('products', JSON.stringify(state.products));
         },
         removeProduct: (state, action: PayloadAction<string>) => {
             const index = state.products.findIndex(
@@ -75,7 +73,6 @@ export const productSlice = createSlice({
             if (index > -1) {
                 state.products.splice(index, 1);
             }
-            localStorage.setItem('products', JSON.stringify(state.products));
         },
     },
     extraReducers: (builder) => {

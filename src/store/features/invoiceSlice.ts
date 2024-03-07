@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import invoiceService from 'src/http/services/invoiceService';
 
 export interface InvoiceItem {
+    _id: string;
     productId: string;
     productName: string;
     purchasePrice: number;
@@ -11,16 +13,18 @@ export interface InvoiceItem {
 }
 
 export interface Invoice {
+    _id: string;
     orderId: string;
-    invoiceId: string;
     date: string;
     customerId: string;
-    customerName: string;
     subTotal: number;
     discount: number;
     total: number;
     paid: boolean;
+    paymentDate: string;
     invoiceItems: InvoiceItem[];
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface InvoiceState {
@@ -31,19 +35,13 @@ interface InvoiceState {
 
 const initialState: InvoiceState = {
     loading: true,
-    invoices: JSON.parse(localStorage.getItem('invoices') || '[]'),
+    invoices: [],
     error: '',
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchInvoices = createAsyncThunk<Invoice[]>(
-    'invoice/fetchInvoices',
-    () =>
-        new Promise((resolve, _) => {
-            setTimeout(() => {
-                resolve(JSON.parse(localStorage.getItem('invoices') || '[]'));
-            }, 200);
-        })
+export const fetchInvoices = createAsyncThunk<Invoice[]>('invoice/fetchInvoices', () =>
+    invoiceService.getInvoices()
 );
 
 export const invoiceSlice = createSlice({
@@ -54,32 +52,28 @@ export const invoiceSlice = createSlice({
             if (action.payload) {
                 state.invoices.push(action.payload);
             }
-            localStorage.setItem('invoices', JSON.stringify(state.invoices));
         },
         updateInvoice: (state, action: PayloadAction<Invoice>) => {
             const invoice = state.invoices.find(
-                (_invoice: Invoice) => _invoice.invoiceId === action.payload.invoiceId
+                (_invoice: Invoice) => _invoice._id === action.payload._id
             );
             if (invoice) {
                 invoice.date = action.payload.date;
                 invoice.customerId = action.payload.customerId;
-                invoice.customerName = action.payload.customerName;
                 invoice.subTotal = action.payload.subTotal;
                 invoice.discount = action.payload.discount;
                 invoice.total = action.payload.total;
                 invoice.paid = action.payload.paid;
                 invoice.invoiceItems = action.payload.invoiceItems;
             }
-            localStorage.setItem('invoices', JSON.stringify(state.invoices));
         },
         removeInvoice: (state, action: PayloadAction<string>) => {
             const index = state.invoices.findIndex(
-                (invoice: Invoice) => invoice.invoiceId === action.payload
+                (invoice: Invoice) => invoice._id === action.payload
             );
             if (index > -1) {
                 state.invoices.splice(index, 1);
             }
-            localStorage.setItem('invoices', JSON.stringify(state.invoices));
         },
     },
     extraReducers: (builder) => {

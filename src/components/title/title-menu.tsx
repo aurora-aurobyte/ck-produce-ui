@@ -7,16 +7,17 @@ import Iconify from 'src/components/iconify';
 type TitleMenuProps = {
     label: string;
     to?: string;
+    edit?: boolean;
 };
 
-export default function TitleMenu({ label, to }: TitleMenuProps) {
+export default function TitleMenu({ label, to, edit }: TitleMenuProps) {
     return (
         <Button
             component={RouterLink}
             href={to}
             variant="contained"
             color="inherit"
-            startIcon={<Iconify icon="eva:plus-fill" />}
+            startIcon={<Iconify icon={edit ? 'eva:edit-outline' : 'eva:plus-fill'} />}
         >
             {label}
         </Button>

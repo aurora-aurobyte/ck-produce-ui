@@ -11,8 +11,8 @@ import { useEffect } from 'react';
 import { fToNow } from 'src/utils/format-time';
 import productService from 'src/http/services/productService';
 
-export default function ViewProducts() {
-    const products = useAppSelector((state) => state.product.products);
+export default function ListProducts() {
+    const { loading, products } = useAppSelector((state) => state.product);
     const dispatch = useAppDispatch();
 
     const handleDeleteClick = async (product: Product) => {
@@ -31,6 +31,7 @@ export default function ViewProducts() {
             </Title>
             <Table<Product>
                 data={products}
+                loading={loading}
                 columns={[
                     { id: 'name', label: 'Name' },
                     { id: 'unitPrice', label: 'Unit Price' },
@@ -39,6 +40,7 @@ export default function ViewProducts() {
                     { id: 'tax', label: 'Tax' },
                     { id: 'description', label: 'Description' },
                 ]}
+                viewPage={(row: Product) => `/products/view/${row._id}`}
                 editPage={(row: Product) => `/products/edit/${row._id}`}
                 onRemoveClick={handleDeleteClick}
                 renderRow={(row) => (

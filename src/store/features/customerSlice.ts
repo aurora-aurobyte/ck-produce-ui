@@ -39,7 +39,6 @@ export const customerSlice = createSlice({
             if (action.payload) {
                 state.customers.push(action.payload);
             }
-            localStorage.setItem('customers', JSON.stringify(state.customers));
         },
         updateCustomer: (
             state,
@@ -52,7 +51,6 @@ export const customerSlice = createSlice({
                 customer.name = action.payload.name;
                 customer.address = action.payload.address;
             }
-            localStorage.setItem('customers', JSON.stringify(state.customers));
         },
         removeCustomer: (state, action: PayloadAction<string>) => {
             const index = state.customers.findIndex(
@@ -61,7 +59,6 @@ export const customerSlice = createSlice({
             if (index > -1) {
                 state.customers.splice(index, 1);
             }
-            localStorage.setItem('customers', JSON.stringify(state.customers));
         },
     },
     extraReducers: (builder) => {

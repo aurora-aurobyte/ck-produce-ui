@@ -15,13 +15,15 @@ import { RouterLink } from 'src/routes/components';
 
 type RenderRowProps<T> = {
     row: T;
-    editPage?: (row: T) => string | undefined;
+    viewPage?: (row: T) => string;
+    editPage?: (row: T) => string;
     onRemoveClick?: (row: T) => any;
     renderRow: (row: T) => ReactNode;
 };
 
 export default function RenderRow<T>({
     row,
+    viewPage,
     editPage,
     onRemoveClick,
     renderRow,
@@ -29,6 +31,7 @@ export default function RenderRow<T>({
     const [open, setOpen] = useState<boolean>(false);
     const [actionPending, setActionPending] = useState(false);
 
+    const viewPageUrl = useMemo(() => (viewPage ? viewPage(row) : '#'), [viewPage, row]);
     const editPageUrl = useMemo(() => (editPage ? editPage(row) : '#'), [editPage, row]);
 
     const handleOpenMenu = () => {
@@ -53,6 +56,18 @@ export default function RenderRow<T>({
             </Card>
             <Dialog open={!!open} onClose={handleCloseMenu}>
                 <Box>
+                    {viewPage && (
+                        <MenuItem
+                            onClick={handleCloseMenu}
+                            component={RouterLink}
+                            to={viewPageUrl}
+                            disabled={actionPending}
+                        >
+                            <Iconify icon="eva:list-outline" sx={{ mr: 2 }} />
+                            View
+                        </MenuItem>
+                    )}
+
                     {editPage && (
                         <MenuItem
                             onClick={handleCloseMenu}

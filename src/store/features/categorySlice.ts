@@ -33,7 +33,6 @@ export const categorySlice = createSlice({
             if (action.payload) {
                 state.categories.push(action.payload);
             }
-            localStorage.setItem('categories', JSON.stringify(state.categories));
         },
         updateCategory: (
             state,
@@ -48,7 +47,6 @@ export const categorySlice = createSlice({
             if (category) {
                 category.name = action.payload.name;
             }
-            localStorage.setItem('categories', JSON.stringify(state.categories));
         },
         removeCategory: (state, action: PayloadAction<string>) => {
             const index = state.categories.findIndex(
@@ -57,7 +55,6 @@ export const categorySlice = createSlice({
             if (index > -1) {
                 state.categories.splice(index, 1);
             }
-            localStorage.setItem('categories', JSON.stringify(state.categories));
         },
     },
     extraReducers: (builder) => {

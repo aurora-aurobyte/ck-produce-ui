@@ -37,8 +37,10 @@ interface IFormInput {
 }
 
 interface IFormItemInput {
+    _id: string;
     productId: string;
     quantity: number;
+    delivered: boolean;
 }
 
 // const defaultValues: Order = {
@@ -51,8 +53,10 @@ interface IFormItemInput {
 // };
 
 const initialOrderItem: IFormItemInput = {
+    _id: '',
     productId: '',
     quantity: 0,
+    delivered: false,
 };
 
 // const defaultOrderItem: OrderItem = {
