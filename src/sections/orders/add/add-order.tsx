@@ -37,14 +37,13 @@ interface IFormInput {
 }
 
 interface IFormItemInput {
-    _id: string;
+    _id?: string;
     productId: string;
     quantity: number;
     delivered: boolean;
 }
 
 const initialOrderItem: IFormItemInput = {
-    _id: '',
     productId: '',
     quantity: 0,
     delivered: false,
@@ -68,8 +67,8 @@ export default function AddOrder({ orderId, edit }: AddOrderProps) {
     } = useForm<IFormInput>({
         mode: 'onChange',
         defaultValues: async () => {
-            if (edit) {
-                const order = await orderService.getOrder(orderId as string);
+            if (edit && orderId) {
+                const order = await orderService.getOrder(orderId);
                 return {
                     date: fDate(order.date, 'yyyy-MM-dd'),
                     customerId: order.customerId,

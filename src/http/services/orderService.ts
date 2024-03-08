@@ -11,7 +11,11 @@ function getOrder(id: string): Promise<Order> {
     return http.get(`/${entityName}/${id}`).then((response) => response.data);
 }
 
-function createOrder(data: any): Promise<Order> {
+function createOrder(data: {
+    date: string;
+    customerId: string;
+    orderItems: { productId: string; quantity: number }[];
+}): Promise<Order> {
     return http.post(`/${entityName}`, data).then((response) => response.data);
 }
 
