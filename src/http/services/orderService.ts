@@ -15,7 +15,11 @@ function createOrder(data: any): Promise<Order> {
     return http.post(`/${entityName}`, data).then((response) => response.data);
 }
 
-function updateOrder(orderId: string, data: any) {
+type UpdateOrderResponse = {
+    updated: Order | null;
+};
+
+function updateOrder(orderId: string, data: any): Promise<UpdateOrderResponse> {
     return http.put(`/${entityName}/${orderId}`, data).then((response) => response.data);
 }
 
