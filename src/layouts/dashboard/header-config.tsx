@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { setBackUrl, setTitle } from 'src/store/features/configSlice';
+import { clearConfig, setBackUrl, setTitle } from 'src/store/features/configSlice';
 import { useAppDispatch } from 'src/store/hooks';
 
 type HeaderConfigProps = {
@@ -11,15 +11,17 @@ export default function HeaderConfig({ backUrl, title }: HeaderConfigProps) {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        if (backUrl) {
-            dispatch(setBackUrl(backUrl));
-        }
+        dispatch(setBackUrl(backUrl || ''));
+        return () => {
+            dispatch(clearConfig());
+        };
     }, [dispatch, backUrl]);
 
     useEffect(() => {
-        if (title) {
-            dispatch(setTitle(title));
-        }
+        dispatch(setTitle(title || ''));
+        return () => {
+            dispatch(clearConfig());
+        };
     }, [dispatch, title]);
     return null;
 }

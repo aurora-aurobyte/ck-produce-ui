@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { fDate, fToNow } from 'src/utils/format-time';
 import invoiceService from 'src/http/services/invoiceService';
 import { fCurrency } from 'src/utils/format-number';
+import Label from 'src/components/label';
 
 export default function ListInvoices() {
     const { loading, invoices } = useAppSelector((state) => state.invoice);
@@ -70,11 +71,9 @@ export default function ListInvoices() {
                                 <Typography color="text.secondary">
                                     {row.invoiceItems.length} Items
                                 </Typography>
-                                {row.paid ? (
-                                    <Chip sx={{ width: '71.71px' }} label="Paid" color="success" />
-                                ) : (
-                                    <Chip label="Not Paid" color="error" />
-                                )}
+                                <Label color={row.paid ? 'success' : 'error'}>
+                                    {row.paid ? 'Paid' : 'Not Paid'}
+                                </Label>
                             </Stack>
                         </Stack>
                         <Typography color="text.secondary" fontSize={12} mt={1}>

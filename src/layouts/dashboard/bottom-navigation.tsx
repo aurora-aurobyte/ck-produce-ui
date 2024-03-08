@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Paper from '@mui/material/Paper';
@@ -8,12 +8,18 @@ import { bgBlur } from 'src/theme/css';
 
 import { RouterLink } from 'src/routes/components';
 
-// import RestoreIcon from '@mui/icons-material/Restore';
-// import FavoriteIcon from '@mui/icons-material/Favorite';
-// import LocationOnIcon from '@mui/icons-material/LocationOn';
-
 import SvgColor from 'src/components/svg-color';
 import { bottomNavConfig } from './config-navigation';
+
+// ----------------------------------------------------------------
+
+function IconContainer({ children }: { children: ReactNode }) {
+    return (
+        <Box component="span" sx={{ width: 36, height: 36 }}>
+            {children}
+        </Box>
+    );
+}
 
 type BottomNavigationBarType = {
     toggleNav: () => void;
@@ -52,10 +58,11 @@ export default function BottomNavigationBar({ toggleNav }: BottomNavigationBarTy
                         <BottomNavigationAction
                             sx={{
                                 textTransform: 'capitalize',
+                                minWidth: '60px',
                             }}
                             key={item.title}
                             label={item.title}
-                            icon={item.icon}
+                            icon={<IconContainer>{item.icon}</IconContainer>}
                             component={RouterLink}
                             to={item.path}
                         />
@@ -66,10 +73,12 @@ export default function BottomNavigationBar({ toggleNav }: BottomNavigationBarTy
                         }}
                         label="Menu"
                         icon={
-                            <SvgColor
-                                src="/assets/icons/ic_menu.svg"
-                                sx={{ width: 1, height: 1 }}
-                            />
+                            <IconContainer>
+                                <SvgColor
+                                    src="/assets/icons/ic_menu.svg"
+                                    sx={{ width: 1, height: 1 }}
+                                />
+                            </IconContainer>
                         }
                         onClick={toggleNav}
                     />

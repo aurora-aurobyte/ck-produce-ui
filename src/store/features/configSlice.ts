@@ -20,8 +20,12 @@ export const configSlice = createSlice({
         setTitle(state, action: PayloadAction<string>) {
             state.title = action.payload;
         },
+        clearConfig(state) {
+            state.title = '';
+            state.backUrl = '';
+        },
     },
 });
 
 export default configSlice.reducer;
-export const { setBackUrl, setTitle } = configSlice.actions;
+export const { setBackUrl, setTitle, clearConfig } = configSlice.actions;

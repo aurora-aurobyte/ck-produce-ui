@@ -20,6 +20,8 @@ import { useRouter } from 'src/routes/hooks';
 import { NAV, HEADER } from './config-layout';
 
 import navConfig from './config-navigation';
+// import NotificationsPopover from './common/notifications-popover';
+import AccountPopover from './common/account-popover';
 
 // ----------------------------------------------------------------------
 
@@ -53,23 +55,42 @@ export default function Header() {
             )}
 
             {/* <Searchbar /> */}
-            <Typography
-                variant="h6"
-                component="h2"
-                sx={{
-                    textTransform: 'capitalize',
-                    color: theme.palette.text.secondary,
-                }}
-            >
-                {title || current?.title}
-            </Typography>
+            {!lgUp && (
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{
+                            textTransform: 'capitalize',
+                            color: theme.palette.text.secondary,
+                        }}
+                        textAlign="center"
+                    >
+                        {title || current?.title}
+                    </Typography>
+                </Box>
+            )}
+            {lgUp && (
+                <>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{
+                            textTransform: 'capitalize',
+                            color: theme.palette.text.secondary,
+                        }}
+                    >
+                        {title || current?.title}
+                    </Typography>
 
-            <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ flexGrow: 1 }} />
+                </>
+            )}
 
             <Stack direction="row" alignItems="center" spacing={1}>
                 {/* <LanguagePopover /> */}
-                {/* <NotificationsPopover />
-                <AccountPopover /> */}
+                {/* <NotificationsPopover /> */}
+                <AccountPopover />
             </Stack>
         </>
     );

@@ -42,6 +42,7 @@ export const ListPendingPaymentsPage = lazy(
     () => import('src/pages/pendingPayments/list-pendingPayments-page')
 );
 
+export const ProfilePage = lazy(() => import('src/pages/profile-page'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -77,6 +78,9 @@ export default function Router() {
             ),
             children: [
                 { element: <IndexPage />, index: true },
+                { path: 'user', element: <UserPage /> },
+                { path: 'blog', element: <BlogPage /> },
+                { path: 'profile', element: <ProfilePage /> },
                 {
                     path: 'customers',
                     children: [
@@ -85,7 +89,6 @@ export default function Router() {
                         { path: 'edit/:customerId', element: <EditCustomerPage /> },
                     ],
                 },
-                { path: 'user', element: <UserPage /> },
                 {
                     path: 'products',
                     children: [
@@ -128,7 +131,6 @@ export default function Router() {
                     path: 'pendingPayments',
                     children: [{ element: <ListPendingPaymentsPage />, index: true }],
                 },
-                { path: 'blog', element: <BlogPage /> },
                 {
                     path: 'categories',
                     children: [
