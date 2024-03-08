@@ -38,7 +38,9 @@ export const PurchasesEditPage = lazy(() => import('src/pages/purchases-edit'));
 
 export const ListToBuysPage = lazy(() => import('src/pages/toBuys/list-toBuys-page'));
 
-export const PendingPaymentsPage = lazy(() => import('src/pages/pendingPayments'));
+export const ListPendingPaymentsPage = lazy(
+    () => import('src/pages/pendingPayments/list-pendingPayments-page')
+);
 
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
@@ -124,7 +126,7 @@ export default function Router() {
                 },
                 {
                     path: 'pendingPayments',
-                    children: [{ element: <PendingPaymentsPage />, index: true }],
+                    children: [{ element: <ListPendingPaymentsPage />, index: true }],
                 },
                 { path: 'blog', element: <BlogPage /> },
                 {

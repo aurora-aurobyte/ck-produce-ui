@@ -1,1 +1,1 @@
-export { default as PendingPaymentsView } from './view/pendingPayments-view';
+export { default as ListPendingPayments } from './list/list-pendingPayments';
