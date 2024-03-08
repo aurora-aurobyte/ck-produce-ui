@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import AppBar from '@mui/material/AppBar';
@@ -15,37 +13,42 @@ import { bgBlur } from 'src/theme/css';
 import Iconify from 'src/components/iconify';
 
 import { useMemo } from 'react';
+import { useAppSelector } from 'src/store/hooks';
 import { matchPath, useLocation } from 'react-router-dom';
 // import Searchbar from './common/searchbar';
+import { useRouter } from 'src/routes/hooks';
 import { NAV, HEADER } from './config-layout';
-// import AccountPopover from './common/account-popover';
-// import LanguagePopover from './common/language-popover';
-// import NotificationsPopover from './common/notifications-popover';
 
 import navConfig from './config-navigation';
 
 // ----------------------------------------------------------------------
 
-type prop = {
-    onOpenNav: () => void;
-};
-
-export default function Header({ onOpenNav }: prop) {
+export default function Header() {
     const theme = useTheme();
     const location = useLocation();
+    const router = useRouter();
 
     const lgUp = useResponsive('up', 'lg', null);
+
+    const { title, backUrl } = useAppSelector((state) => state.config);
 
     const current = useMemo(
         () => navConfig.find((item: any) => matchPath({ path: item.path }, location.pathname)),
         [location]
     );
 
+    const handleBackClick = () => {
+        if (backUrl) {
+            return router.push(backUrl);
+        }
+        return router.back();
+    };
+
     const renderContent = (
         <>
             {!lgUp && (
-                <IconButton onClick={onOpenNav} sx={{ mr: 1 }}>
-                    <Iconify icon="eva:menu-2-fill" />
+                <IconButton onClick={handleBackClick} sx={{ mr: 1 }}>
+                    <Iconify icon="eva:arrow-back-outline" />
                 </IconButton>
             )}
 
@@ -58,7 +61,7 @@ export default function Header({ onOpenNav }: prop) {
                     color: theme.palette.text.secondary,
                 }}
             >
-                {current?.title}
+                {title || current?.title}
             </Typography>
 
             <Box sx={{ flexGrow: 1 }} />
@@ -101,7 +104,3 @@ export default function Header({ onOpenNav }: prop) {
         </AppBar>
     );
 }
-
-Header.propTypes = {
-    onOpenNav: PropTypes.func,
-};
