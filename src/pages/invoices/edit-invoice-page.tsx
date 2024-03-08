@@ -5,7 +5,7 @@ import { AddInvoice } from 'src/sections/invoices';
 
 // ----------------------------------------------------------------------
 
-export default function InvoicesEditPage() {
+export default function EditInvoicePage() {
     const { invoiceId } = useParams();
     return (
         <>

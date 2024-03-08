@@ -83,7 +83,16 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                     discount: invoice.discount,
                     paid: invoice.paid,
                     paymentDate: fDate(invoice.paymentDate, 'yyyy-MM-dd'),
-                    invoiceItems: invoice.invoiceItems,
+                    invoiceItems: invoice.invoiceItems.map((invoiceItem) => {
+                        const amount =
+                            (invoiceItem.unitPrice || 0) *
+                            (invoiceItem.quantity || 0) *
+                            (1 + (invoiceItem.tax || 0) / 100);
+                        return {
+                            ...invoiceItem,
+                            amount: Number(amount.toFixed(2)),
+                        };
+                    }),
                 };
             }
             return {

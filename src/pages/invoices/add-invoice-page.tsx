@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { InvoicesView } from 'src/sections/invoices';
+import { AddInvoice } from 'src/sections/invoices';
 
 // ----------------------------------------------------------------------
 
-export default function InvoicesPage() {
+export default function AddInvoicePage() {
     return (
         <>
             <Helmet>
-                <title> Invoices | Minimal UI </title>
+                <title> Add Invoice | Minimal UI </title>
             </Helmet>
 
-            <InvoicesView />
+            <AddInvoice />
         </>
     );
 }
