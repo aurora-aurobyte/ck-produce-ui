@@ -11,6 +11,7 @@ import { Invoice, fetchInvoices, removeInvoice } from 'src/store/features/invoic
 import { useEffect } from 'react';
 import { fDate, fToNow } from 'src/utils/format-time';
 import invoiceService from 'src/http/services/invoiceService';
+import { fCurrency } from 'src/utils/format-number';
 
 export default function ListInvoices() {
     const { loading, invoices } = useAppSelector((state) => state.invoice);
@@ -61,7 +62,9 @@ export default function ListInvoices() {
                                     {row.customer?.name || 'No Customer Name'}
                                 </Typography>
                                 <Typography variant="body2">{fDate(row.date)}</Typography>
-                                <Typography variant="body2">Total: ${row.total}</Typography>
+                                <Typography variant="body2">
+                                    Total: {fCurrency(row.total)}
+                                </Typography>
                             </Stack>
                             <Stack>
                                 <Typography color="text.secondary">

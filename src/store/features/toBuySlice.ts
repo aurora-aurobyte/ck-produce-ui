@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Order, OrderItem } from './orderSlice';
+import toBuyService from 'src/http/services/toBuyService';
+import { Product } from './productSlice';
 
 export interface ToBuy {
+    _id: string;
     productId: string;
-    productName: string;
     quantity: number;
+    orders: number;
+    product?: Product;
 }
 
 interface ToBuyState {
@@ -15,38 +18,13 @@ interface ToBuyState {
 
 const initialState: ToBuyState = {
     loading: true,
-    toBuys: JSON.parse(localStorage.getItem('toBuys') || '[]'),
+    toBuys: [],
     error: '',
 };
 
 // Generates pending, fulfilled and rejected action types
-export const fetchToBuys = createAsyncThunk<ToBuy[]>(
-    'toBuy/fetchToBuys',
-    () =>
-        new Promise((resolve, _) => {
-            setTimeout(() => {
-                const orders = JSON.parse(localStorage.getItem('orders') || '[]') as Order[];
-                const toBuys = orders.reduce((acc: ToBuy[], order: Order) => {
-                    order.orderItems.forEach((orderItem: OrderItem) => {
-                        const toBuyItem = acc.find(
-                            (toBuy: ToBuy) => toBuy.productId === orderItem.productId
-                        );
-                        if (toBuyItem) {
-                            toBuyItem.quantity += orderItem.quantity;
-                        } else {
-                            acc.push({
-                                productId: orderItem.productId,
-                                productName: orderItem.product?.name || '',
-                                quantity: orderItem.quantity,
-                            });
-                        }
-                    });
-                    return acc;
-                }, [] as ToBuy[]);
-
-                resolve(toBuys);
-            }, 200);
-        })
+export const fetchToBuys = createAsyncThunk<ToBuy[], string>('toBuy/fetchToBuys', (date: string) =>
+    toBuyService.getToBuys(date)
 );
 
 export const toBuySlice = createSlice({

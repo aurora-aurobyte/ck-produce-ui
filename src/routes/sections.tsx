@@ -36,7 +36,7 @@ export const PurchasesPage = lazy(() => import('src/pages/purchases'));
 export const PurchasesAddPage = lazy(() => import('src/pages/purchases-add'));
 export const PurchasesEditPage = lazy(() => import('src/pages/purchases-edit'));
 
-export const ToBuysPage = lazy(() => import('src/pages/toBuys'));
+export const ListToBuysPage = lazy(() => import('src/pages/toBuys/list-toBuys-page'));
 
 export const PendingPaymentsPage = lazy(() => import('src/pages/pendingPayments'));
 
@@ -120,7 +120,7 @@ export default function Router() {
                 },
                 {
                     path: 'toBuy',
-                    children: [{ element: <ToBuysPage />, index: true }],
+                    children: [{ element: <ListToBuysPage />, index: true }],
                 },
                 {
                     path: 'pendingPayments',

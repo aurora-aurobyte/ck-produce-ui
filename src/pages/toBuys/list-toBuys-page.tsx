@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { ToBuysView } from 'src/sections/toBuys';
+import { ListToBuys } from 'src/sections/toBuys';
 
 // ----------------------------------------------------------------------
 
-export default function ToBuysPage() {
+export default function ListToBuysPage() {
     return (
         <>
             <Helmet>
-                <title> ToBuys | Minimal UI </title>
+                <title> Items To Buy | Minimal UI </title>
             </Helmet>
 
-            <ToBuysView />
+            <ListToBuys />
         </>
     );
 }
