@@ -35,6 +35,10 @@ export default function OrderCard({ order, loading }: OrderCardType) {
         setSearchParams({ invoice: '0' });
     };
 
+    const handlePrintClick = () => {
+        window.print();
+    };
+
     const invoiceOpened = useMemo(() => searchParams.get('invoice') === '1', [searchParams]);
 
     if (loading) return <Loader />;
@@ -79,6 +83,14 @@ export default function OrderCard({ order, loading }: OrderCardType) {
                     onClick={handleCreateInvoiceClick}
                 >
                     Create Invoice
+                </Button>
+                <Button
+                    variant="contained"
+                    color="inherit"
+                    type="button"
+                    onClick={handlePrintClick}
+                >
+                    Print
                 </Button>
             </Stack>
             <CreateInvoice open={invoiceOpened} handleClose={handleInvoiceClose} order={order} />
