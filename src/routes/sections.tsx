@@ -30,6 +30,7 @@ export const AddOrderPage = lazy(() => import('src/pages/orders/add-order-page')
 export const EditOrderPage = lazy(() => import('src/pages/orders/edit-order-page'));
 
 export const ListInvoicesPage = lazy(() => import('src/pages/invoices/list-invoices-page'));
+export const ViewInvoicePage = lazy(() => import('src/pages/invoices/view-invoice-page'));
 export const AddInvoicePage = lazy(() => import('src/pages/invoices/add-invoice-page'));
 export const EditInvoicePage = lazy(() => import('src/pages/invoices/edit-invoice-page'));
 
@@ -113,6 +114,7 @@ export default function Router() {
                     path: 'invoices',
                     children: [
                         { element: <ListInvoicesPage />, index: true },
+                        { path: 'view/:invoiceId', element: <ViewInvoicePage /> },
                         { path: 'add', element: <AddInvoicePage /> },
                         { path: 'edit/:invoiceId', element: <EditInvoicePage /> },
                     ],

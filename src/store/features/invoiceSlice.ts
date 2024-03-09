@@ -2,15 +2,14 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import invoiceService from 'src/http/services/invoiceService';
 import { Customer } from './customerSlice';
 import { Order } from './orderSlice';
+import { Product } from './productSlice';
 
 export interface InvoiceItem {
     _id: string;
     productId: string;
-    productName: string;
-    purchasePrice: number;
+    product?: Product;
     unitPrice: number;
     tax: number;
-    category: string;
     quantity: number;
 }
 

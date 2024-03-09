@@ -53,6 +53,7 @@ export default function ListInvoices() {
                     },
                     { id: 'total', label: 'Total ($)' },
                 ]}
+                viewPage={(row: Invoice) => `/invoices/view/${row._id}`}
                 editPage={(row: Invoice) => `/invoices/edit/${row._id}`}
                 onRemoveClick={handleDeleteClick}
                 renderRow={(row) => (
