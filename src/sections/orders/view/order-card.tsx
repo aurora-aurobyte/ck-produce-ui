@@ -12,8 +12,10 @@ import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 import Loader from 'src/components/loader/loader';
+import Label from 'src/components/label';
 import { fDate } from 'src/utils/format-time';
 import CreateInvoice from './create-invoice';
 
@@ -47,28 +49,72 @@ export default function OrderCard({ order, loading }: OrderCardType) {
         <Box>
             <Grid container spacing={2}>
                 <Grid item xs={6} md={6}>
-                    {fDate(order.date, 'yyyy-MM-dd')}
+                    <Typography variant="subtitle1">
+                        <Typography component="span" variant="body1">
+                            Date
+                        </Typography>
+                        &nbsp;
+                        {fDate(order.date, 'yyyy-MM-dd')}
+                    </Typography>
                 </Grid>
                 <Grid item xs={6} md={6}>
-                    {order.customer?.name}
+                    <Typography variant="subtitle1">
+                        <Typography component="span" variant="body1">
+                            Customer
+                        </Typography>
+                        &nbsp;
+                        {order.customer?.name}
+                    </Typography>
+                </Grid>
+                <Grid item xs={6} md={6}>
+                    <Typography variant="subtitle1">
+                        <Typography component="span" variant="body1">
+                            Business Name
+                        </Typography>
+                        &nbsp;
+                        {order.customer?.businessName}
+                    </Typography>
+                </Grid>
+                <Grid item xs={6} md={6}>
+                    <Typography variant="subtitle1">
+                        <Typography component="span" variant="body1">
+                            Address
+                        </Typography>
+                        &nbsp;
+                        {order.customer?.address}
+                    </Typography>
                 </Grid>
             </Grid>
             <TableContainer sx={{ mt: 2 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ pl: 0 }}>Product Name</TableCell>
-                            <TableCell align="right">Qty</TableCell>
-                            <TableCell sx={{ px: 0 }}>Status</TableCell>
+                            <TableCell sx={{ pl: 0 }}>
+                                <Typography variant="subtitle1">Product Name</Typography>
+                            </TableCell>
+                            <TableCell align="right">
+                                <Typography variant="subtitle1">Qty</Typography>
+                            </TableCell>
+                            <TableCell sx={{ px: 0 }}>
+                                <Typography variant="subtitle1">Status</Typography>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {order.orderItems.map((orderItem: OrderItem) => (
                             <TableRow key={orderItem._id} hover>
-                                <TableCell sx={{ pl: 0 }}>{orderItem.product?.name}</TableCell>
-                                <TableCell align="right">{orderItem.quantity}</TableCell>
-                                <TableCell align="right" sx={{ px: 0 }}>
-                                    {orderItem.delivered ? 'delivered' : 'not delivered'}
+                                <TableCell sx={{ pl: 0 }}>
+                                    <Typography variant="body1">
+                                        {orderItem.product?.name}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Typography variant="body1">{orderItem.quantity}</Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Label color={orderItem.delivered ? 'success' : 'error'}>
+                                        {orderItem.delivered ? 'delivered' : 'not delivered'}
+                                    </Label>
                                 </TableCell>
                             </TableRow>
                         ))}
