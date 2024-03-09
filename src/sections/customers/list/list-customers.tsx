@@ -35,6 +35,7 @@ export default function ListCustomers() {
                     { id: 'name', label: 'Name' },
                     { id: 'address', label: 'Address' },
                 ]}
+                viewPage={(row: Customer) => `/customers/view/${row._id}`}
                 editPage={(row: Customer) => `/customers/edit/${row._id}`}
                 onRemoveClick={handleDeleteClick}
                 renderRow={(row) => (

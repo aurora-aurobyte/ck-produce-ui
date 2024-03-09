@@ -33,7 +33,7 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isLoading, isSubmitting },
     } = useForm<IFormInput>({
         mode: 'onChange',
         defaultValues: async () => {
@@ -75,6 +75,8 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
         }
         router.push('/customers');
     };
+
+    if (isLoading) return 'Loading...';
 
     return (
         <Container>
@@ -201,7 +203,13 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <Button variant="contained" color="inherit" type="submit">
+                        <Button
+                            key={`${isSubmitting}`}
+                            variant="contained"
+                            color="inherit"
+                            type="submit"
+                            disabled={isSubmitting}
+                        >
                             Save
                         </Button>
                     </Grid>
