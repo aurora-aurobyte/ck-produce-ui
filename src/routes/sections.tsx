@@ -15,6 +15,7 @@ export const AddCategoryPage = lazy(() => import('src/pages/categories/add-categ
 export const EditCategoryPage = lazy(() => import('src/pages/categories/edit-category-page'));
 
 export const ListCustomersPage = lazy(() => import('src/pages/customers/list-customers-page'));
+export const ViewCustomerPage = lazy(() => import('src/pages/customers/view-customer-page'));
 export const AddCustomerPage = lazy(() => import('src/pages/customers/add-customer-page'));
 export const EditCustomerPage = lazy(() => import('src/pages/customers/edit-customer-page'));
 
@@ -86,6 +87,7 @@ export default function Router() {
                     children: [
                         { element: <ListCustomersPage />, index: true },
                         { path: 'add', element: <AddCustomerPage /> },
+                        { path: 'view/:customerId', element: <ViewCustomerPage /> },
                         { path: 'edit/:customerId', element: <EditCustomerPage /> },
                     ],
                 },
