@@ -9,6 +9,11 @@ export const IndexPage = lazy(() => import('src/pages/app'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 
+export const ListCategoriesPage = lazy(() => import('src/pages/categories/list-categories-page'));
+export const ViewCategoryPage = lazy(() => import('src/pages/categories/view-category-page'));
+export const AddCategoryPage = lazy(() => import('src/pages/categories/add-category-page'));
+export const EditCategoryPage = lazy(() => import('src/pages/categories/edit-category-page'));
+
 export const ListCustomersPage = lazy(() => import('src/pages/customers/list-customers-page'));
 export const AddCustomerPage = lazy(() => import('src/pages/customers/add-customer-page'));
 export const EditCustomerPage = lazy(() => import('src/pages/customers/edit-customer-page'));
@@ -23,25 +28,23 @@ export const ViewOrderPage = lazy(() => import('src/pages/orders/view-order-page
 export const AddOrderPage = lazy(() => import('src/pages/orders/add-order-page'));
 export const EditOrderPage = lazy(() => import('src/pages/orders/edit-order-page'));
 
-export const InvoicesPage = lazy(() => import('src/pages/invoices'));
-export const InvoicesAddPage = lazy(() => import('src/pages/invoices-add'));
-export const InvoicesEditPage = lazy(() => import('src/pages/invoices-edit'));
+export const ListInvoicesPage = lazy(() => import('src/pages/invoices/list-invoices-page'));
+export const AddInvoicePage = lazy(() => import('src/pages/invoices/add-invoice-page'));
+export const EditInvoicePage = lazy(() => import('src/pages/invoices/edit-invoice-page'));
 
 export const PurchasesPage = lazy(() => import('src/pages/purchases'));
 export const PurchasesAddPage = lazy(() => import('src/pages/purchases-add'));
 export const PurchasesEditPage = lazy(() => import('src/pages/purchases-edit'));
 
-export const ToBuysPage = lazy(() => import('src/pages/toBuys'));
+export const ListToBuysPage = lazy(() => import('src/pages/toBuys/list-toBuys-page'));
 
-export const PendingPaymentsPage = lazy(() => import('src/pages/pendingPayments'));
+export const ListPendingPaymentsPage = lazy(
+    () => import('src/pages/pendingPayments/list-pendingPayments-page')
+);
 
+export const ProfilePage = lazy(() => import('src/pages/profile-page'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
-
-export const ListCategoriesPage = lazy(() => import('src/pages/categories/list-categories-page'));
-export const ViewCategoryPage = lazy(() => import('src/pages/categories/view-category-page'));
-export const AddCategoryPage = lazy(() => import('src/pages/categories/add-category-page'));
-export const EditCategoryPage = lazy(() => import('src/pages/categories/edit-category-page'));
 
 // ----------------------------------------------------------------------
 
@@ -75,6 +78,9 @@ export default function Router() {
             ),
             children: [
                 { element: <IndexPage />, index: true },
+                { path: 'user', element: <UserPage /> },
+                { path: 'blog', element: <BlogPage /> },
+                { path: 'profile', element: <ProfilePage /> },
                 {
                     path: 'customers',
                     children: [
@@ -83,7 +89,6 @@ export default function Router() {
                         { path: 'edit/:customerId', element: <EditCustomerPage /> },
                     ],
                 },
-                { path: 'user', element: <UserPage /> },
                 {
                     path: 'products',
                     children: [
@@ -105,9 +110,9 @@ export default function Router() {
                 {
                     path: 'invoices',
                     children: [
-                        { element: <InvoicesPage />, index: true },
-                        { path: 'add', element: <InvoicesAddPage /> },
-                        { path: 'edit/:invoiceId', element: <InvoicesEditPage /> },
+                        { element: <ListInvoicesPage />, index: true },
+                        { path: 'add', element: <AddInvoicePage /> },
+                        { path: 'edit/:invoiceId', element: <EditInvoicePage /> },
                     ],
                 },
                 {
@@ -120,13 +125,12 @@ export default function Router() {
                 },
                 {
                     path: 'toBuy',
-                    children: [{ element: <ToBuysPage />, index: true }],
+                    children: [{ element: <ListToBuysPage />, index: true }],
                 },
                 {
                     path: 'pendingPayments',
-                    children: [{ element: <PendingPaymentsPage />, index: true }],
+                    children: [{ element: <ListPendingPaymentsPage />, index: true }],
                 },
-                { path: 'blog', element: <BlogPage /> },
                 {
                     path: 'categories',
                     children: [

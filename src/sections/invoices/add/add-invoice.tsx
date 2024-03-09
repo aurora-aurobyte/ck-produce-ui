@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, FormEvent, useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import Container from 'src/components/container/container';
 import Title from 'src/components/title';
 
@@ -15,42 +15,44 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 
 import Iconify from 'src/components/iconify';
-import { Invoice, InvoiceItem, addInvoice, updateInvoice } from 'src/store/features/invoiceSlice';
-import { Product, fetchProducts } from 'src/store/features/productSlice';
-import { Customer, fetchCustomers } from 'src/store/features/customerSlice';
+import { fetchProducts } from 'src/store/features/productSlice';
+import { fetchCustomers } from 'src/store/features/customerSlice';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
+
+import { addInvoice, updateInvoice } from 'src/store/features/invoiceSlice';
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
+import invoiceService from 'src/http/services/invoiceService';
 import { fDate } from 'src/utils/format-time';
-import { v4 as uuidv4 } from 'uuid';
-
-const defaultValues: Invoice = {
-    orderId: '',
-    invoiceId: '',
-    customerId: '',
-    customerName: '',
-    date: new Date().toString(),
-    subTotal: 0,
-    discount: 0,
-    total: 0,
-    paid: false,
-    invoiceItems: [],
-};
-
-const defaultInvoiceItem: InvoiceItem = {
-    productId: '',
-    productName: '',
-    purchasePrice: 0,
-    unitPrice: 0,
-    tax: 0,
-    category: '',
-    quantity: 1,
-};
+import Loader from 'src/components/loader/loader';
 
 // ----------------------------------------------------------------
+
+interface IFormInput {
+    orderId: string;
+    date: string;
+    customerId: string;
+    discount: number;
+    paid: boolean;
+    paymentDate: string;
+    invoiceItems: IFormItemInput[];
+}
+
+interface IFormItemInput {
+    _id?: string;
+    productId: string;
+    quantity: number;
+    unitPrice?: number;
+    tax?: number;
+    amount?: number;
+}
+
+const initialInvoiceItem: IFormItemInput = {
+    productId: '',
+    quantity: 0,
+};
 
 type AddInvoiceProps = {
     invoiceId?: string;
@@ -58,87 +60,80 @@ type AddInvoiceProps = {
 };
 
 export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
-    const invoices = useAppSelector((state) => state.invoice.invoices);
     const products = useAppSelector((state) => state.product.products);
     const customers = useAppSelector((state) => state.customer.customers);
+    const [totalState, setTotalState] = useState({ subTotal: 0, total: 0 });
 
-    const [invoiceValues, setInvoiceValues] = useState<Invoice>(defaultValues);
-    const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
-    const [invoiceItemsValues, setInvoiceItemsValues] = useState<InvoiceItem>(defaultInvoiceItem);
+    const {
+        register,
+        handleSubmit,
+        control,
+        setValue,
+        watch,
+        formState: { errors, isLoading, isSubmitting },
+    } = useForm<IFormInput>({
+        mode: 'onChange',
+        defaultValues: async () => {
+            if (edit && invoiceId) {
+                const invoice = await invoiceService.getInvoice(invoiceId);
+                return {
+                    orderId: invoice.orderId,
+                    date: fDate(invoice.date, 'yyyy-MM-dd'),
+                    customerId: invoice.customerId,
+                    discount: invoice.discount,
+                    paid: invoice.paid,
+                    paymentDate: fDate(invoice.paymentDate, 'yyyy-MM-dd'),
+                    invoiceItems: invoice.invoiceItems.map((invoiceItem) => {
+                        const amount =
+                            (invoiceItem.unitPrice || 0) *
+                            (invoiceItem.quantity || 0) *
+                            (1 + (invoiceItem.tax || 0) / 100);
+                        return {
+                            ...invoiceItem,
+                            amount: Number(amount.toFixed(2)),
+                        };
+                    }),
+                };
+            }
+            return {
+                orderId: '',
+                date: fDate(new Date().toString(), 'yyyy-MM-dd'),
+                customerId: '',
+                discount: 0,
+                paid: false,
+                paymentDate: fDate(new Date().toString(), 'yyyy-MM-dd'),
+                invoiceItems: [initialInvoiceItem],
+            };
+        },
+    });
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: 'invoiceItems',
+    });
 
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const handleInvoiceChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInvoiceValues({ ...invoiceValues, [event.target.name]: event.target.value });
-    };
-
-    const handlePaidChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInvoiceValues({ ...invoiceValues, paid: event.target.checked });
-    };
-
-    const handleInvoiceItemChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInvoiceItemsValues((_invoiceItemsValues: InvoiceItem) => {
-            const { name, value } = event.target;
-            const duplicatedInvoiceItems = { ..._invoiceItemsValues, [name]: value };
-            if (name === 'productId') {
-                const addedProduct = products.find((product) => product._id === value);
-                duplicatedInvoiceItems.unitPrice = addedProduct?.unitPrice || 0;
-                duplicatedInvoiceItems.tax = addedProduct?.tax || 0;
-            }
-            return duplicatedInvoiceItems;
-        });
-    };
-
-    const handleSubmit = (event: FormEvent) => {
-        event.preventDefault();
+    const onSubmit: SubmitHandler<IFormInput> = async (values) => {
         if (edit) {
-            dispatch(
-                updateInvoice({ ...invoiceValues, invoiceItems, invoiceId: invoiceId as string })
-            );
+            const { updated } = await invoiceService.updateInvoice(invoiceId as string, values);
+            if (updated) {
+                dispatch(updateInvoice(updated));
+            }
         } else {
-            dispatch(addInvoice({ ...invoiceValues, invoiceId: uuidv4(), invoiceItems }));
+            const addedInvoice = await invoiceService.createNewInvoice(values);
+            dispatch(addInvoice(addedInvoice));
         }
-        router.back();
+        router.push('/invoices');
     };
 
-    const handleRemoveItem = (productId: string) => {
-        setInvoiceItems((_invoiceItems: InvoiceItem[]) =>
-            _invoiceItems.filter((item: InvoiceItem) => item.productId !== productId)
-        );
+    const handleRemoveItem = (index: number) => {
+        remove(index);
     };
 
     const handleAddInvoiceItem = () => {
-        if (invoiceItemsValues.productId && invoiceItemsValues.quantity) {
-            setInvoiceItems((_invoiceItems: InvoiceItem[]) => [
-                ..._invoiceItems,
-                {
-                    productId: invoiceItemsValues.productId,
-                    productName: products.find(
-                        (product) => product._id === invoiceItemsValues.productId
-                    )?.name as string,
-                    purchasePrice: invoiceItemsValues.purchasePrice,
-                    unitPrice: invoiceItemsValues.unitPrice,
-                    tax: invoiceItemsValues.tax,
-                    category: invoiceItemsValues.category,
-                    quantity: invoiceItemsValues.quantity,
-                },
-            ]);
-            setInvoiceItemsValues(defaultInvoiceItem);
-        }
+        append(initialInvoiceItem);
     };
-
-    useEffect(() => {
-        if (edit && invoiceId && invoices) {
-            const invoice = invoices.find(
-                (_invoice) => _invoice.invoiceId === invoiceId
-            ) as Invoice;
-            if (invoice) {
-                setInvoiceValues(invoice);
-                setInvoiceItems(invoice.invoiceItems);
-            }
-        }
-    }, [edit, invoiceId, invoices]);
 
     useEffect(() => {
         dispatch(fetchProducts());
@@ -146,255 +141,246 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
     }, [dispatch]);
 
     useEffect(() => {
-        setInvoiceValues((_invoiceItems) => ({
-            ..._invoiceItems,
-            total: _invoiceItems.subTotal - _invoiceItems.discount,
-        }));
-    }, [invoiceValues.discount]);
-
-    useEffect(() => {
-        setInvoiceValues((_invoiceValues) => {
-            const subTotal = invoiceItems.reduce(
-                (acc, item) => acc + item.unitPrice * item.quantity * (1 + item.tax / 100),
-                0
-            );
-            return {
-                ..._invoiceValues,
-                subTotal,
-                total: subTotal - _invoiceValues.discount,
-            };
+        const subscription = watch((value, { name }) => {
+            if (name === 'invoiceItems' && !value.invoiceItems?.length) {
+                append(initialInvoiceItem);
+            }
+            const itemName = name?.split('.')?.[2];
+            if (itemName && itemName === 'productId') {
+                const id = Number(name?.split('.')?.[1]);
+                const product = products.find(
+                    (_product) => _product._id === value.invoiceItems?.[id]?.productId
+                );
+                if (product) {
+                    const { unitPrice, tax } = product;
+                    setValue(`invoiceItems.${id}.unitPrice`, unitPrice);
+                    setValue(`invoiceItems.${id}.tax`, tax);
+                    setValue(`invoiceItems.${id}.quantity`, 0);
+                    setValue(`invoiceItems.${id}.amount`, 0);
+                }
+            }
+            if (itemName === 'quantity') {
+                const id = Number(name?.split('.')?.[1]);
+                const amount =
+                    (value.invoiceItems?.[id]?.unitPrice || 0) *
+                    (value.invoiceItems?.[id]?.quantity || 0) *
+                    (1 + (value.invoiceItems?.[id]?.tax || 0) / 100);
+                setValue(`invoiceItems.${id}.amount`, Number(amount.toFixed(2)));
+            }
+            const subTotal =
+                value.invoiceItems?.reduce((acc, item) => acc + (item?.amount || 0), 0) || 0;
+            const total = subTotal - (value.discount || 0);
+            setTotalState({
+                subTotal: Number(subTotal.toFixed(2)),
+                total: Number(total.toFixed(2)),
+            });
         });
-    }, [invoiceItems]);
+        return () => subscription.unsubscribe();
+    }, [watch, append, products, setValue]);
 
-    const filteredProducts = useMemo(
-        () =>
-            products.filter(
-                (product: Product) =>
-                    invoiceItems.findIndex(
-                        (invoiceItem: InvoiceItem) => product._id === invoiceItem.productId
-                    ) === -1
-            ),
-        [invoiceItems, products]
+    const renderForm = (
+        <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+            <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                    <TextField
+                        id="date"
+                        label="Invoice Date"
+                        variant="standard"
+                        type="date"
+                        fullWidth
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        {...register('date', {
+                            required: 'This is required',
+                        })}
+                        error={!!errors.date}
+                        helperText={errors.date?.message}
+                    />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                    <Controller
+                        name="customerId"
+                        control={control}
+                        defaultValue=""
+                        render={({ field: { onChange, onBlur, value, ref } }) => (
+                            <TextField
+                                ref={ref}
+                                id="customerId"
+                                select
+                                label="Customer"
+                                variant="standard"
+                                fullWidth
+                                value={value}
+                                onChange={onChange}
+                                onBlur={onBlur}
+                                error={!!errors.customerId}
+                                helperText={errors.customerId?.message}
+                                defaultValue=""
+                            >
+                                {customers.map((item) => (
+                                    <MenuItem key={item._id} value={item._id}>
+                                        {item.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        )}
+                    />
+                </Grid>
+            </Grid>
+            <TableContainer sx={{ mt: 2 }}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ pl: 0 }}>Product Name</TableCell>
+                            <TableCell align="right">Price</TableCell>
+                            <TableCell align="right">Tax</TableCell>
+                            <TableCell align="right">Qty</TableCell>
+                            <TableCell align="right">Amt</TableCell>
+                            <TableCell sx={{ px: 0 }} />
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {fields.map((_: IFormItemInput, index: number) => (
+                            <TableRow key={index} hover>
+                                <TableCell sx={{ pl: 0 }}>
+                                    <Controller
+                                        name={`invoiceItems.${index}.productId`}
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field: { onChange, onBlur, value, ref } }) => (
+                                            <TextField
+                                                ref={ref}
+                                                id={`invoiceItems.${index}.productId`}
+                                                select
+                                                label="Product"
+                                                variant="standard"
+                                                fullWidth
+                                                value={value}
+                                                onChange={onChange}
+                                                onBlur={onBlur}
+                                                error={!!errors.invoiceItems?.[index]?.productId}
+                                                helperText={
+                                                    errors.invoiceItems?.[index]?.productId?.message
+                                                }
+                                                defaultValue=""
+                                            >
+                                                {products.map((item) => (
+                                                    <MenuItem key={item._id} value={item._id}>
+                                                        {item.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+                                        )}
+                                    />
+                                </TableCell>
+                                <TableCell align="right">
+                                    {watch(`invoiceItems.${index}.unitPrice`, 0)}
+                                </TableCell>
+                                <TableCell align="right">
+                                    {watch(`invoiceItems.${index}.tax`, 0)}
+                                </TableCell>
+                                <TableCell align="right">
+                                    <TextField
+                                        id={`invoiceItems.${index}.quantity`}
+                                        label="Qty"
+                                        variant="standard"
+                                        type="number"
+                                        onFocus={(event) => {
+                                            event.target.select();
+                                        }}
+                                        {...register(`invoiceItems.${index}.quantity`, {
+                                            required: 'This is required',
+                                            min: {
+                                                value: 1,
+                                                message: 'Qty minimum is 1.',
+                                            },
+                                        })}
+                                        error={!!errors.invoiceItems?.[index]?.quantity}
+                                        helperText={errors.invoiceItems?.[index]?.quantity?.message}
+                                    />
+                                </TableCell>
+                                <TableCell align="right">
+                                    {watch(`invoiceItems.${index}.amount`, 0)}
+                                </TableCell>
+                                <TableCell align="right" sx={{ px: 0 }}>
+                                    <IconButton onClick={() => handleRemoveItem(index)}>
+                                        <Iconify icon="eva:trash-2-fill" />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                        <TableRow
+                            sx={(theme) => ({
+                                backgroundColor: theme.palette.action.hover,
+                            })}
+                        >
+                            <TableCell align="right" sx={{ px: 0 }} colSpan={6}>
+                                <Button
+                                    onClick={handleAddInvoiceItem}
+                                    endIcon={<Iconify icon="eva:plus-circle-outline" />}
+                                >
+                                    Add
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell align="right" colSpan={3}>
+                                Sub total
+                            </TableCell>
+                            <TableCell align="right">{totalState.subTotal}</TableCell>
+                            <TableCell sx={{ px: 0 }} />
+                        </TableRow>
+                        <TableRow>
+                            <TableCell align="right" colSpan={3}>
+                                Discount
+                            </TableCell>
+                            <TableCell align="right" colSpan={2} sx={{ pr: 0 }}>
+                                <TextField
+                                    id="discount"
+                                    label="Discount"
+                                    variant="standard"
+                                    type="discount"
+                                    fullWidth
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    {...register('discount', {
+                                        required: 'This is required',
+                                    })}
+                                    error={!!errors.discount}
+                                    helperText={errors.discount?.message}
+                                />
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell align="right" colSpan={3}>
+                                Total
+                            </TableCell>
+                            <TableCell align="right">{totalState.total}</TableCell>
+                            <TableCell sx={{ px: 0 }} />
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                <Button
+                    variant="contained"
+                    color="inherit"
+                    type="submit"
+                    key={`${isSubmitting}`}
+                    disabled={isSubmitting}
+                >
+                    Save
+                </Button>
+            </Stack>
+        </Box>
     );
 
     return (
         <Container>
             <Title title={edit ? 'Edit Invoice' : 'Add Invoice'} />
-            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
-                    <Grid item xs={6} md={6}>
-                        <TextField
-                            id="orderId"
-                            name="orderId"
-                            label="Order ID"
-                            variant="standard"
-                            fullWidth
-                            size="small"
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            value={invoiceValues.orderId}
-                        />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                        <TextField
-                            id="date"
-                            name="date"
-                            label="Invoice Date"
-                            variant="standard"
-                            fullWidth
-                            size="small"
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            value={fDate(invoiceValues.date)}
-                        />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                        <TextField
-                            id="customerName"
-                            name="customerName"
-                            label="Customer"
-                            variant="standard"
-                            select
-                            fullWidth
-                            size="small"
-                            value={invoiceValues.customerName}
-                            onChange={handleInvoiceChange}
-                        >
-                            {customers.map((customer: Customer) => (
-                                <MenuItem key={customer.customerId} value={customer.name}>
-                                    {customer.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    name="paid"
-                                    checked={invoiceValues.paid}
-                                    onChange={handlePaidChange}
-                                />
-                            }
-                            label="Paid"
-                        />
-                    </Grid>
-                </Grid>
-                <TableContainer sx={{ mt: 2 }}>
-                    <Table size="small">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ pl: 0 }}>Product Name</TableCell>
-                                <TableCell align="right">Price</TableCell>
-                                <TableCell align="right">Tax</TableCell>
-                                <TableCell align="right">Qty</TableCell>
-                                <TableCell align="right">Total</TableCell>
-                                <TableCell sx={{ px: 0 }} />
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {invoiceItems.map((invoiceItem: InvoiceItem) => (
-                                <TableRow key={invoiceItem.productId} hover>
-                                    <TableCell sx={{ pl: 0 }}>{invoiceItem.productName}</TableCell>
-                                    <TableCell align="right">{invoiceItem.unitPrice}</TableCell>
-                                    <TableCell align="right">{invoiceItem.tax}</TableCell>
-                                    <TableCell align="right">{invoiceItem.quantity}</TableCell>
-                                    <TableCell align="right">
-                                        {invoiceItem.unitPrice *
-                                            invoiceItem.quantity *
-                                            (1 + invoiceItem.tax / 100)}
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ px: 0 }}>
-                                        <IconButton
-                                            onClick={() => handleRemoveItem(invoiceItem.productId)}
-                                        >
-                                            <Iconify icon="eva:trash-2-fill" />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            <TableRow
-                                sx={(theme) => ({
-                                    backgroundColor: theme.palette.action.hover,
-                                })}
-                            >
-                                <TableCell sx={{ pl: 0 }}>
-                                    <TextField
-                                        id="productId"
-                                        name="productId"
-                                        label="Product"
-                                        variant="standard"
-                                        select
-                                        fullWidth
-                                        value={invoiceItemsValues.productId}
-                                        onChange={handleInvoiceItemChange}
-                                    >
-                                        {filteredProducts.map((product: Product) => (
-                                            <MenuItem key={product._id} value={product._id}>
-                                                {product.name}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                </TableCell>
-                                <TableCell>
-                                    <TextField
-                                        id="unitPrice"
-                                        name="unitPrice"
-                                        label="Price"
-                                        variant="standard"
-                                        type="number"
-                                        fullWidth
-                                        value={invoiceItemsValues.unitPrice}
-                                        onChange={handleInvoiceItemChange}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <TextField
-                                        id="tax"
-                                        name="tax"
-                                        label="Tax"
-                                        variant="standard"
-                                        type="number"
-                                        fullWidth
-                                        value={invoiceItemsValues.tax}
-                                        onChange={handleInvoiceItemChange}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <TextField
-                                        id="quantity"
-                                        name="quantity"
-                                        label="Quantity"
-                                        variant="standard"
-                                        type="number"
-                                        fullWidth
-                                        value={invoiceItemsValues.quantity}
-                                        onChange={handleInvoiceItemChange}
-                                    />
-                                </TableCell>
-                                <TableCell align="right">
-                                    {invoiceItemsValues.unitPrice *
-                                        invoiceItemsValues.quantity *
-                                        (1 + invoiceItemsValues.tax / 100)}
-                                </TableCell>
-                                <TableCell align="right" sx={{ px: 0 }}>
-                                    <IconButton onClick={handleAddInvoiceItem}>
-                                        <Iconify icon="eva:plus-circle-outline" />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right" colSpan={3}>
-                                    Sub total
-                                </TableCell>
-                                <TableCell align="right">{invoiceValues.subTotal}</TableCell>
-                                <TableCell sx={{ px: 0 }} />
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right" colSpan={3}>
-                                    Discount
-                                </TableCell>
-                                <TableCell align="right" colSpan={2} sx={{ pr: 0 }}>
-                                    <TextField
-                                        id="discount"
-                                        name="discount"
-                                        label="Discount"
-                                        variant="standard"
-                                        type="number"
-                                        fullWidth
-                                        size="small"
-                                        value={invoiceValues.discount}
-                                        onChange={handleInvoiceChange}
-                                    />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right" colSpan={3}>
-                                    Total
-                                </TableCell>
-                                <TableCell align="right">{invoiceValues.total}</TableCell>
-                                <TableCell sx={{ px: 0 }} />
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-                    <Button variant="contained" color="inherit" type="submit">
-                        Save
-                    </Button>
-                    <Button variant="contained" color="inherit" type="button">
-                        Print
-                    </Button>
-                </Stack>
-            </Box>
+            {isLoading ? <Loader /> : renderForm}
         </Container>
     );
 }

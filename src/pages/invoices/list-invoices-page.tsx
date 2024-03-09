@@ -1,17 +1,19 @@
 import { Helmet } from 'react-helmet-async';
+import HeaderConfig from 'src/layouts/dashboard/header-config';
 
-import { InvoicesView } from 'src/sections/invoices';
+import { ListInvoices } from 'src/sections/invoices';
 
 // ----------------------------------------------------------------------
 
-export default function InvoicesPage() {
+export default function ListInvoicesPage() {
     return (
         <>
             <Helmet>
                 <title> Invoices | Minimal UI </title>
             </Helmet>
+            <HeaderConfig title="Invoices" backUrl="/" />
 
-            <InvoicesView />
+            <ListInvoices />
         </>
     );
 }

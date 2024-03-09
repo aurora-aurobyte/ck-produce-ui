@@ -1,1 +1,1 @@
-export { default as ToBuysView } from './view/toBuys-view';
+export { default as ListToBuys } from './view/list-toBuys';

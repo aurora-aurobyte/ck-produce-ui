@@ -42,11 +42,11 @@ const navConfig = [
         path: '/invoices',
         icon: icon('ic_invoice'),
     },
-    {
-        title: 'purchase',
-        path: '/purchases',
-        icon: icon('ic_purchase'),
-    },
+    // {
+    //     title: 'purchase',
+    //     path: '/purchases',
+    //     icon: icon('ic_purchase'),
+    // },
     {
         title: 'to buy',
         path: '/toBuy',

@@ -18,7 +18,7 @@ function createNewInvoice(data: {
     discount: number;
     paid: boolean;
     paymentDate: string;
-    invoiceItems: [{ productId: string; quantity: number }];
+    invoiceItems: { productId: string; quantity: number }[];
 }): Promise<Invoice> {
     return http.post(`/${entityName}/new`, data).then((response) => response.data);
 }

@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import pendingPaymentService from 'src/http/services/pendingPaymentService';
 import { Customer } from './customerSlice';
 import { Invoice } from './invoiceSlice';
 
@@ -7,6 +8,7 @@ export interface PendingPayment {
     customer?: Customer;
     previousBalance: number;
     invoiceBalance: number;
+    invoices: Invoice[];
 }
 
 interface PendingPaymentState {
@@ -17,35 +19,14 @@ interface PendingPaymentState {
 
 const initialState: PendingPaymentState = {
     loading: true,
-    pendingPayments: JSON.parse(localStorage.getItem('pendingPayments') || '[]'),
+    pendingPayments: [],
     error: '',
 };
 
 // Generates pending, fulfilled and rejected action types
 export const fetchPendingPayments = createAsyncThunk<PendingPayment[]>(
     'pendingPayment/fetchPendingPayments',
-    () =>
-        new Promise((resolve, _) => {
-            setTimeout(() => {
-                const customers = JSON.parse(
-                    localStorage.getItem('customers') || '[]'
-                ) as Customer[];
-                const invoices = JSON.parse(localStorage.getItem('invoices') || '[]') as Invoice[];
-                const pendingPayments: PendingPayment[] = customers.map((customer: Customer) => ({
-                    customerId: customer._id,
-                    customerName: customer.name,
-                    previousBalance: customer.balance || 0,
-                    invoiceBalance: invoices.reduce((total: number, invoice: Invoice) => {
-                        if (invoice.customerId === customer._id) {
-                            total += invoice.total;
-                        }
-                        return total;
-                    }, 0),
-                }));
-
-                resolve(pendingPayments);
-            }, 200);
-        })
+    () => pendingPaymentService.getPendingPayments()
 );
 
 export const pendingPaymentSlice = createSlice({

@@ -1,19 +1,19 @@
 import { Helmet } from 'react-helmet-async';
 import HeaderConfig from 'src/layouts/dashboard/header-config';
 
-import { ListCustomers } from 'src/sections/customers';
+import { ListToBuys } from 'src/sections/toBuys';
 
 // ----------------------------------------------------------------------
 
-export default function ListCustomersPage() {
+export default function ListToBuysPage() {
     return (
         <>
             <Helmet>
-                <title> Customers | Minimal UI </title>
+                <title> Items To Buy | Minimal UI </title>
             </Helmet>
-            <HeaderConfig title="Customers" backUrl="/" />
+            <HeaderConfig title="To Buys" backUrl="/" />
 
-            <ListCustomers />
+            <ListToBuys />
         </>
     );
 }

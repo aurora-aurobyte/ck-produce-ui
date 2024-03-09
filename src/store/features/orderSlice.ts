@@ -48,7 +48,6 @@ export const orderSlice = createSlice({
             if (action.payload) {
                 state.orders.push(action.payload);
             }
-            localStorage.setItem('orders', JSON.stringify(state.orders));
         },
         updateOrder: (
             state,

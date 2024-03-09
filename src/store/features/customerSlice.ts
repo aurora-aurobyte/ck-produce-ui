@@ -22,7 +22,7 @@ interface CustomerState {
 
 const initialState: CustomerState = {
     loading: true,
-    customers: JSON.parse(localStorage.getItem('customers') || '[]'),
+    customers: [],
     error: '',
 };
 

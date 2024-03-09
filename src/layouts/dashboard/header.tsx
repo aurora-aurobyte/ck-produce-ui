@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import AppBar from '@mui/material/AppBar';
@@ -15,58 +13,84 @@ import { bgBlur } from 'src/theme/css';
 import Iconify from 'src/components/iconify';
 
 import { useMemo } from 'react';
+import { useAppSelector } from 'src/store/hooks';
 import { matchPath, useLocation } from 'react-router-dom';
 // import Searchbar from './common/searchbar';
+import { useRouter } from 'src/routes/hooks';
 import { NAV, HEADER } from './config-layout';
-// import AccountPopover from './common/account-popover';
-// import LanguagePopover from './common/language-popover';
-// import NotificationsPopover from './common/notifications-popover';
 
 import navConfig from './config-navigation';
+// import NotificationsPopover from './common/notifications-popover';
+import AccountPopover from './common/account-popover';
 
 // ----------------------------------------------------------------------
 
-type prop = {
-    onOpenNav: () => void;
-};
-
-export default function Header({ onOpenNav }: prop) {
+export default function Header() {
     const theme = useTheme();
     const location = useLocation();
+    const router = useRouter();
 
     const lgUp = useResponsive('up', 'lg', null);
+
+    const { title, backUrl } = useAppSelector((state) => state.config);
 
     const current = useMemo(
         () => navConfig.find((item: any) => matchPath({ path: item.path }, location.pathname)),
         [location]
     );
 
+    const handleBackClick = () => {
+        if (backUrl) {
+            return router.push(backUrl);
+        }
+        return router.back();
+    };
+
     const renderContent = (
         <>
             {!lgUp && (
-                <IconButton onClick={onOpenNav} sx={{ mr: 1 }}>
-                    <Iconify icon="eva:menu-2-fill" />
+                <IconButton onClick={handleBackClick} sx={{ mr: 1 }}>
+                    <Iconify icon="eva:arrow-back-outline" />
                 </IconButton>
             )}
 
             {/* <Searchbar /> */}
-            <Typography
-                variant="h6"
-                component="h2"
-                sx={{
-                    textTransform: 'capitalize',
-                    color: theme.palette.text.secondary,
-                }}
-            >
-                {current?.title}
-            </Typography>
+            {!lgUp && (
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{
+                            textTransform: 'capitalize',
+                            color: theme.palette.text.secondary,
+                        }}
+                        textAlign="center"
+                    >
+                        {title || current?.title}
+                    </Typography>
+                </Box>
+            )}
+            {lgUp && (
+                <>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{
+                            textTransform: 'capitalize',
+                            color: theme.palette.text.secondary,
+                        }}
+                    >
+                        {title || current?.title}
+                    </Typography>
 
-            <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ flexGrow: 1 }} />
+                </>
+            )}
 
             <Stack direction="row" alignItems="center" spacing={1}>
                 {/* <LanguagePopover /> */}
-                {/* <NotificationsPopover />
-                <AccountPopover /> */}
+                {/* <NotificationsPopover /> */}
+                <AccountPopover />
             </Stack>
         </>
     );
@@ -101,7 +125,3 @@ export default function Header({ onOpenNav }: prop) {
         </AppBar>
     );
 }
-
-Header.propTypes = {
-    onOpenNav: PropTypes.func,
-};
