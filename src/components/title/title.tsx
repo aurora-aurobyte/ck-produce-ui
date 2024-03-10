@@ -4,12 +4,13 @@ import React from 'react';
 
 type TitleProps = {
     title: string;
+    removeOnPrint?: boolean;
     children?: React.ReactNode;
 };
 
-export default function Title({ title, children }: TitleProps) {
+export default function Title({ title, children, removeOnPrint }: TitleProps) {
     return (
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} className={removeOnPrint ? 'remove-on-print' : undefined}>
             <Typography variant="h4">{title}</Typography>
 
             {children}
