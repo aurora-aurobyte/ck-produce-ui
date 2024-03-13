@@ -25,7 +25,7 @@ export default function ViewOrder({ orderId }: ViewOrderType) {
 
     return (
         <Container>
-            <Title title="View Order" removeOnPrint>
+            <Title title="View Order">
                 <TitleMenu label="Edit Order" edit to={`/orders/edit/${orderId}`} />
             </Title>
             <OrderCard order={order as Order} loading={loading} />

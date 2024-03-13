@@ -97,7 +97,7 @@ export default function Header() {
 
     return (
         <AppBar
-            className='remove-on-print'
+            className="app-bar"
             // @ts-ignore
             sx={{
                 boxShadow: 'none',
