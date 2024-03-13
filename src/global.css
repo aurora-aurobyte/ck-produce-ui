@@ -1,2 +1,12 @@
 /* scrollbar */
 @import 'simplebar-react/dist/simplebar.min.css';
+
+@media print {
+    .app-bar,
+    .bottom-navigation-bar,
+    .title-component {
+        visibility: hidden !important;
+        display: none !important;
+        pointer-events: none !important;
+    }
+}

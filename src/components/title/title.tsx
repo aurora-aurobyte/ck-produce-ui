@@ -9,7 +9,7 @@ type TitleProps = {
 
 export default function Title({ title, children }: TitleProps) {
     return (
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} className="title-component">
             <Typography variant="h4">{title}</Typography>
 
             {children}
