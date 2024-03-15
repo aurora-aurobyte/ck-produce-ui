@@ -97,6 +97,7 @@ export default function Header() {
 
     return (
         <AppBar
+            className="app-bar"
             // @ts-ignore
             sx={{
                 boxShadow: 'none',

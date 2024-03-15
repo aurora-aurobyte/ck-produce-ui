@@ -30,7 +30,7 @@ export default function BottomNavigationBar({ toggleNav }: BottomNavigationBarTy
     const [value, setValue] = useState(0);
 
     return (
-        <Box sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
+        <Box className="bottom-navigation-bar" sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
             <Paper
                 elevation={3}
                 // @ts-ignore

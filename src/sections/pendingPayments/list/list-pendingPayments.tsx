@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import PendingPaymentItem from './pendingPayment-item';
 
 export default function ListPendingPayments() {
-    const pendingPayments = useAppSelector((state) => state.pendingPayment.pendingPayments);
+    const { pendingPayments, loading } = useAppSelector((state) => state.pendingPayment);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -20,6 +20,7 @@ export default function ListPendingPayments() {
             <Title title="Pending Payments" />
             <Table<PendingPayment>
                 data={pendingPayments}
+                loading={loading}
                 columns={[
                     { id: 'customerName', label: 'Name' },
                     { id: 'previousBalance', label: 'Previous Balance' },

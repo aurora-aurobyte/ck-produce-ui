@@ -12,7 +12,7 @@ import customerService from 'src/http/services/customerService';
 import { fToNow } from 'src/utils/format-time';
 
 export default function ListCustomers() {
-    const customers = useAppSelector((state) => state.customer.customers);
+    const { customers, loading } = useAppSelector((state) => state.customer);
     const dispatch = useAppDispatch();
 
     const handleDeleteClick = async (customer: Customer) => {
@@ -31,10 +31,12 @@ export default function ListCustomers() {
             </Title>
             <Table<Customer>
                 data={customers}
+                loading={loading}
                 columns={[
                     { id: 'name', label: 'Name' },
                     { id: 'address', label: 'Address' },
                 ]}
+                viewPage={(row: Customer) => `/customers/view/${row._id}`}
                 editPage={(row: Customer) => `/customers/edit/${row._id}`}
                 onRemoveClick={handleDeleteClick}
                 renderRow={(row) => (
