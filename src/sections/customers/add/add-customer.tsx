@@ -65,8 +65,7 @@ export default function AddCustomer({ customerId, edit }: AddCustomerProps) {
     const router = useRouter();
 
     const onSubmit: SubmitHandler<IFormInput> = async (values) => {
-        if (!customerId) return;
-        if (edit) {
+        if (edit && customerId) {
             await customerService.updateCustomer(customerId, values);
             dispatch(updateCustomer({ ...values, _id: customerId as string }));
         } else {
