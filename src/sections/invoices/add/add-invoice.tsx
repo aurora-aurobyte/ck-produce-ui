@@ -3,30 +3,31 @@ import Container from 'src/components/container/container';
 import Title from 'src/components/title';
 
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
+import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TextField from '@mui/material/TextField';
 
 import Iconify from 'src/components/iconify';
-import { fetchProducts } from 'src/store/features/productSlice';
-import { fetchCustomers } from 'src/store/features/customerSlice';
-import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { useRouter } from 'src/routes/hooks';
+import { fetchCustomers } from 'src/store/features/customerSlice';
+import { fetchProducts } from 'src/store/features/productSlice';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 
-import { addInvoice, updateInvoice } from 'src/store/features/invoiceSlice';
-import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
-import invoiceService from 'src/http/services/invoiceService';
-import { fDate } from 'src/utils/format-time';
+import { Controller, FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import Loader from 'src/components/loader/loader';
+import invoiceService from 'src/http/services/invoiceService';
+import FormDialog from 'src/sections/products/add/add-product-dialog';
+import { addInvoice, updateInvoice } from 'src/store/features/invoiceSlice';
+import { fDate } from 'src/utils/format-time';
 
 // ----------------------------------------------------------------
 
@@ -63,15 +64,10 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
     const products = useAppSelector((state) => state.product.products);
     const customers = useAppSelector((state) => state.customer.customers);
     const [totalState, setTotalState] = useState({ subTotal: 0, total: 0 });
+    const [ids, setId] = useState<number>(0);
+    const [isEdit, setIsEdit] = useState<boolean>(false);
 
-    const {
-        register,
-        handleSubmit,
-        control,
-        setValue,
-        watch,
-        formState: { errors, isLoading, isSubmitting },
-    } = useForm<IFormInput>({
+    const methods = useForm<IFormInput>({
         mode: 'onChange',
         defaultValues: async () => {
             if (edit && invoiceId) {
@@ -106,6 +102,14 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
             };
         },
     });
+    const {
+        register,
+        handleSubmit,
+        control,
+        setValue,
+        watch,
+        formState: { errors, isLoading, isSubmitting },
+    } = methods;
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'invoiceItems',
@@ -266,10 +270,29 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
                                                 defaultValue=""
                                             >
                                                 {products.map((item) => (
-                                                    <MenuItem key={item._id} value={item._id}>
+                                                    <MenuItem
+                                                        key={item._id}
+                                                        value={item._id}
+                                                        onClick={() => {
+                                                            setIsEdit(true);
+                                                            setId(index + 1);
+                                                        }}
+                                                    >
                                                         {item.name}
                                                     </MenuItem>
                                                 ))}
+                                                <MenuItem
+                                                    key={fields.length}
+                                                    onClick={() => {
+                                                        if (edit) {
+                                                            handleAddInvoiceItem();
+                                                        }
+                                                        setIsEdit(false);
+                                                        setId(fields.length);
+                                                    }}
+                                                >
+                                                    Create New Product
+                                                </MenuItem>
                                             </TextField>
                                         )}
                                     />
@@ -380,7 +403,14 @@ export default function AddInvoice({ invoiceId, edit }: AddInvoiceProps) {
     return (
         <Container>
             <Title title={edit ? 'Edit Invoice' : 'Add Invoice'} />
-            {isLoading ? <Loader /> : renderForm}
+            {isLoading ? (
+                <Loader />
+            ) : (
+                <FormProvider {...methods}>
+                    {renderForm}
+                    <FormDialog open={ids} setOpen={setId} edit={isEdit} />
+                </FormProvider>
+            )}
         </Container>
     );
 }

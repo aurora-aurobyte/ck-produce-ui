@@ -29,9 +29,11 @@ interface IFormInput {
 type AddProductProps = {
     productId?: string;
     edit?: boolean;
+    isDialog?: boolean;
+    handleClose?: Function;
 };
 
-export default function AddProduct({ productId, edit }: AddProductProps) {
+export default function AddProduct({ productId, edit, isDialog, handleClose }: AddProductProps) {
     const categories = useAppSelector((state) => state.category.categories);
     const {
         register,
@@ -74,7 +76,12 @@ export default function AddProduct({ productId, edit }: AddProductProps) {
             const addedProduct = await productService.createProduct(values);
             dispatch(addProduct(addedProduct));
         }
-        router.push('/products');
+        if (!isDialog) {
+            router.push('/products');
+        }
+        if (handleClose) {
+            handleClose(values);
+        }
     };
 
     useEffect(() => {
